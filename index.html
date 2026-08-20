@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.X</title>
+
+    <style>
+        @font-face {
+            font-family: 'Ax-Regular';
+            src: url('Ax-Regular.ttf.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #ff0000;
+            font-family: 'Ax-Regular', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #landing {
+            text-align: center;
+            cursor: pointer;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-img {
+            width: 340px;
+            filter: brightness(1.2) contrast(1.2);
+            transition: all 0.6s ease;
+        }
+
+        .logo-img:hover {
+            filter: brightness(1.4) contrast(1.5) drop-shadow(0 0 80px #ff0000);
+            transform: scale(1.08);
+        }
+
+        .text-logo {
+            font-family: 'Ax-Regular', sans-serif;
+            font-size: 3.5rem;
+            letter-spacing: 18px;
+            margin-top: 35px;
+            text-shadow: 0 0 40px #ff0000;
+        }
+
+        #auth-page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .login-box {
+            width: 460px;
+            border: 2px solid #ff0000;
+            padding: 50px 40px 45px;
+            background: #000;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 45px;
+            border-bottom: 1px solid #330000;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px 0;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'Ax-Regular', sans-serif;
+        }
+
+        .tab.active {
+            background: #ff0000;
+            color: #000;
+        }
+
+        .input-group {
+            margin-bottom: 32px;
+        }
+
+        label {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-transform: lowercase;
+            color: #ff0000;
+            font-family: 'Ax-Regular', sans-serif;
+        }
+
+        input {
+            width: 100%;
+            height: 58px;
+            background: #8B0000;
+            border: none;
+            color: #ffffff;
+            font-family: 'Ax-Regular', sans-serif;
+            font-size: 1.4rem;
+            padding: 0 20px;
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 54px;
+            background: transparent;
+            border: 2px solid #ff0000;
+            color: #ff0000;
+            font-family: 'Ax-Regular', sans-serif;
+            font-size: 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #ff0000;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LANDING PAGE -->
+
+    <div id="landing" onclick="goToAuth()">
+        <img src="LogoAX.png" alt="A.X Logo" class="logo-img">
+        <div class="text-logo">A . X</div>
+    </div>
+
+
+    <!-- AUTH PAGE -->
+
+    <div id="auth-page">
+
+        <div class="login-box">
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab(0)">
+                    LOG IN
+                </div>
+
+                <div class="tab" onclick="switchTab(1)">
+                    SIGN UP
+                </div>
+            </div>
+
+
+            <!-- LOGIN -->
+
+            <div id="login-form">
+
+                <div class="input-group">
+                    <label>email</label>
+
+                    <input
+                        type="email"
+                        id="login-email"
+                        autocomplete="email"
+                    >
+                </div>
+
+
+                <div class="input-group">
+                    <label>Password</label>
+
+                    <input
+                        type="password"
+                        id="login-password"
+                        autocomplete="current-password"
+                    >
+                </div>
+
+
+                <button class="login-btn" onclick="login()">
+                    Log in
+                </button>
+
+            </div>
+
+
+            <!-- SIGN UP -->
+
+            <div id="signup-form" style="display: none;">
+
+                <div class="input-group">
+                    <label>username</label>
+
+                    <input
+                        type="text"
+                        id="signup-username"
+                        autocomplete="username"
+                    >
+                </div>
+
+
+                <div class="input-group">
+                    <label>email</label>
+
+                    <input
+                        type="email"
+                        id="signup-email"
+                        autocomplete="email"
+                    >
+                </div>
+
+
+                <div class="input-group">
+                    <label>Password</label>
+
+                    <input
+                        type="password"
+                        id="signup-password"
+                        autocomplete="new-password"
+                    >
+                </div>
+
+
+                <div class="input-group">
+                    <label>Confirm Password</label>
+
+                    <input
+                        type="password"
+                        id="signup-confirm"
+                        autocomplete="new-password"
+                    >
+                </div>
+
+
+                <button class="login-btn" onclick="signup()">
+                    Create Account
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUPABASE -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+
+        const SUPABASE_URL =
+            "https://xsdppckxzzxwnridrjzp.supabase.co";
+
+        const SUPABASE_KEY =
+            "sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH";
+
+        const { createClient } = supabase;
+
+        const db = createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+        /* =========================
+           NAVIGATION
+        ========================= */
+
+        function goToAuth() {
+
+            document.getElementById("landing").style.display = "none";
+
+            document.getElementById("auth-page").style.display = "flex";
+
+        }
+
+
+        function switchTab(tab) {
+
+            document
+                .querySelectorAll(".tab")
+                .forEach((element, index) => {
+
+                    element.classList.toggle(
+                        "active",
+                        index === tab
+                    );
+
+                });
+
+
+            document.getElementById("login-form").style.display =
+                tab === 0 ? "block" : "none";
+
+
+            document.getElementById("signup-form").style.display =
+                tab === 1 ? "block" : "none";
+
+        }
+
+
+        /* =========================
+           SIGN UP
+        ========================= */
+
+        async function signup() {
+
+            const username =
+                document
+                    .getElementById("signup-username")
+                    .value
+                    .trim();
+
+
+            const email =
+                document
+                    .getElementById("signup-email")
+                    .value
+                    .trim();
+
+
+            const password =
+                document
+                    .getElementById("signup-password")
+                    .value;
+
+
+            const confirmPassword =
+                document
+                    .getElementById("signup-confirm")
+                    .value;
+
+
+            if (!username || !email || !password || !confirmPassword) {
+
+                alert("Please fill in every field.");
+
+                return;
+            }
+
+
+            if (password !== confirmPassword) {
+
+                alert("Passwords do not match.");
+
+                return;
+            }
+
+
+            if (username.length < 3) {
+
+                alert("Username must contain at least 3 characters.");
+
+                return;
+            }
+
+
+            if (password.length < 6) {
+
+                alert("Password must contain at least 6 characters.");
+
+                return;
+            }
+
+
+            /* =========================
+               CREATE AUTH ACCOUNT
+            ========================= */
+
+            const { data, error } =
+                await db.auth.signUp({
+
+                    email: email,
+
+                    password: password,
+
+                    options: {
+
+                        data: {
+                            username: username
+                        },
+
+                        emailRedirectTo:
+                            window.location.origin +
+                            window.location.pathname
+                    }
+
+                });
+
+
+            if (error) {
+
+                console.error(error);
+
+                alert(error.message);
+
+                return;
+            }
+
+
+            /* =========================
+               SUCCESS
+            ========================= */
+
+            alert(
+                "Account created successfully!\n\n" +
+                "Check your email and confirm your account before logging in."
+            );
+
+
+            switchTab(0);
+
+            document.getElementById("login-email").value = email;
+
+        }
+
+
+        /* =========================
+           LOGIN
+        ========================= */
+
+        async function login() {
+
+            const email =
+                document
+                    .getElementById("login-email")
+                    .value
+                    .trim();
+
+
+            const password =
+                document
+                    .getElementById("login-password")
+                    .value;
+
+
+            if (!email || !password) {
+
+                alert("Enter your email and password.");
+
+                return;
+            }
+
+
+            /* =========================
+               AUTH LOGIN
+            ========================= */
+
+            const { data, error } =
+                await db.auth.signInWithPassword({
+
+                    email: email,
+
+                    password: password
+
+                });
+
+
+            if (error) {
+
+                console.error(error);
+
+                alert(error.message);
+
+                return;
+            }
+
+
+            /* =========================
+               EMAIL CONFIRMATION
+            ========================= */
+
+            if (!data.user.email_confirmed_at) {
+
+                await db.auth.signOut();
+
+                alert(
+                    "Please confirm your email before logging in."
+                );
+
+                return;
+            }
+
+
+            /* =========================
+               GET PROFILE
+            ========================= */
+
+            const { data: profile, error: profileError } =
+                await db
+                    .from("Profiles")
+                    .select("username")
+                    .eq("id", data.user.id)
+                    .single();
+
+
+            if (profileError) {
+
+                console.error(profileError);
+
+                await db.auth.signOut();
+
+                alert(
+                    "Your account profile could not be found."
+                );
+
+                return;
+            }
+
+
+            /* =========================
+               MARKET
+            ========================= */
+
+            window.location.href = "Market.html";
+
+        }
+
+
+        /* =========================
+           CHECK EXISTING SESSION
+        ========================= */
+
+        async function checkSession() {
+
+            const { data } =
+                await db.auth.getSession();
+
+
+            if (data.session) {
+
+                window.location.href = "Market.html";
+
+            }
+
+        }
+
+
+        checkSession();
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Contracts</title>
+
+<style>
+
+@font-face{
+    font-family:'Ax-Regular';
+    src:url('Ax-Regular.ttf.otf') format('opentype');
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    color:#ff0000;
+    font-family:'Ax-Regular',sans-serif;
+    min-height:100vh;
+}
+
+.top-bar{
+    height:75px;
+    background:#0a0a0a;
+    border-bottom:3px solid #ff0000;
+    display:flex;
+    align-items:center;
+    padding:0 20px;
+    gap:20px;
+}
+
+.left-icons{
+    display:flex;
+    gap:18px;
+}
+
+.left-icons img{
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.left-icons img:hover{
+    transform:scale(1.15);
+}
+
+.header-title{
+    flex:1;
+    text-align:center;
+    font-size:2rem;
+    color:#ff0000;
+}
+
+.market-grid{
+    padding:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:25px;
+}
+
+.market-card{
+    background:#fff;
+    color:#000;
+    padding:20px;
+    border:2px solid #ff0000;
+}
+
+.card-img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+    margin-bottom:15px;
+    background:#ddd;
+}
+
+.reason-select{
+    width:100%;
+    margin-top:15px;
+    padding:10px;
+    background:#111;
+    color:#ff0000;
+    border:1px solid #ff0000;
+    font-family:'Ax-Regular';
+}
+
+.abandon-btn{
+    width:100%;
+    margin-top:15px;
+    padding:10px;
+    background:#ff0000;
+    color:#000;
+    border:none;
+    cursor:pointer;
+    font-family:'Ax-Regular';
+}
+
+.complete-btn{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    background:#000;
+    color:#ff0000;
+    border:none;
+    cursor:pointer;
+    font-family:'Ax-Regular';
+}
+
+.back-btn{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+
+    background:#ff0000;
+    color:#000;
+
+    border:none;
+    padding:12px 20px;
+
+    font-family:'Ax-Regular';
+    cursor:pointer;
+}
+
+.back-btn:hover{
+    transform:scale(1.05);
+}
+
+.empty-text{
+    width:100%;
+    text-align:center;
+    font-size:2rem;
+    color:#ff0000;
+    margin-top:50px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="top-bar">
+
+    <div class="left-icons">
+
+        <img
+            src="file.png"
+            width="40"
+            onclick="window.location.href='filepage.html'"
+        >
+
+        <img
+            src="hunterid.png"
+            width="45"
+            onclick="window.location.href='hunterinfo.html'"
+        >
+
+        <img
+            src="Iconecontrat.png"
+            width="45"
+            onclick="window.location.href='Contrats.html'"
+        >
+
+    </div>
+
+    <div class="header-title">
+        MY CONTRACTS
+    </div>
+
+</div>
+
+<div
+    id="contracts-container"
+    class="market-grid"
+></div>
+
+<script>
+
+const currentUser =
+    localStorage.getItem('ax_user');
+
+if(!currentUser){
+
+    window.location.href =
+        'index.html';
+
+}
+
+let announcements =
+    JSON.parse(
+        localStorage.getItem(
+            'ax_announcements'
+        )
+    ) || [];
+
+function renderContracts(){
+
+    const container =
+        document.getElementById(
+            'contracts-container'
+        );
+
+    container.innerHTML = '';
+
+    const myContracts =
+        announcements.filter(
+            ann =>
+            ann.taken === true &&
+            ann.hunter === currentUser
+        );
+
+    if(myContracts.length === 0){
+
+        container.innerHTML = `
+            <div class="empty-text">
+                NO ACTIVE CONTRACTS
+            </div>
+        `;
+
+        return;
+    }
+
+    myContracts.forEach(contract => {
+
+        container.innerHTML += `
+            <div class="market-card">
+
+                ${
+                    contract.image
+                    ? `<img src="${contract.image}" class="card-img">`
+                    : `<div class="card-img"></div>`
+                }
+
+                <h2>
+                    ${contract.title}
+                </h2>
+
+                <p style="margin:15px 0;">
+                    ${contract.desc}
+                </p>
+
+                <p>
+                    <strong>Reward :</strong>
+                    ${contract.reward}
+                </p>
+                        <select
+                    class="reason-select"
+                    id="reason-${contract.title}"
+                >
+
+                    <option>
+                        Mission too difficult
+                    </option>
+
+                    <option>
+                        Reward too low
+                    </option>
+
+                    <option>
+                        Lack of time
+                    </option>
+
+                    <option>
+                        Personal reasons
+                    </option>
+
+                    <option>
+                        Selection mistake
+                    </option>
+
+                    <option>
+                        Health issues
+                    </option>
+
+                    <option>
+                        I accidentally fucked the alien
+                    </option>
+
+                </select>
+
+                <button
+                    class="abandon-btn"
+                    onclick="abandonContract('${contract.title}')"
+                >
+                    ABANDON
+                </button>
+
+                <button
+                    class="complete-btn"
+                    onclick="completeContract('${contract.title}')"
+                >
+                    CONTRACT COMPLETED
+                </button>
+
+            </div>
+        `;
+
+    });
+
+}
+
+function abandonContract(title){
+
+    const reason =
+        document.getElementById(
+            `reason-${title}`
+        ).value;
+
+    if(
+        !confirm(
+            "Abandon this contract?\n\nReason: " +
+            reason
+        )
+    ){
+        return;
+    }
+
+    announcements.forEach(ann => {
+
+        if(ann.title === title){
+
+            ann.taken = false;
+            ann.hunter = null;
+
+        }
+
+    });
+
+    localStorage.setItem(
+        'ax_announcements',
+        JSON.stringify(
+            announcements
+        )
+    );
+
+    renderContracts();
+}
+
+function completeContract(title){
+
+    if(
+        !confirm(
+            "Mark this contract as completed?"
+        )
+    ){
+        return;
+    }
+
+    let completedContracts =
+        JSON.parse(
+            localStorage.getItem(
+                'ax_completed_contracts'
+            )
+        ) || [];
+
+    const contract =
+        announcements.find(
+            ann => ann.title === title
+        );
+
+    if(contract){
+
+        completedContracts.push({
+            ...contract,
+            completedBy: currentUser,
+            completedDate:
+                new Date().toLocaleDateString()
+        });
+
+        localStorage.setItem(
+            'ax_completed_contracts',
+            JSON.stringify(
+                completedContracts
+            )
+        );
+    }
+
+    announcements =
+        announcements.filter(
+            ann => ann.title !== title
+        );
+
+    localStorage.setItem(
+        'ax_announcements',
+        JSON.stringify(
+            announcements
+        )
+    );
+
+    renderContracts();
+}
+    renderContracts();
+
+</script>
+
+<button
+    class="back-btn"
+    onclick="window.location.href='Market.html'"
+>
+    ← MARKET
+</button>
+
+</body>
+</html>
