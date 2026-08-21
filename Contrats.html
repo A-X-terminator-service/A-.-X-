@@ -1,409 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>My Contracts</title>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-
-@font-face{
-    font-family:'Ax-Regular';
-    src:url('Ax-Regular.ttf.otf') format('opentype');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    background:#000;
-    color:#ff0000;
-    font-family:'Ax-Regular',sans-serif;
-    min-height:100vh;
-}
-
-.top-bar{
-    height:75px;
-    background:#0a0a0a;
-    border-bottom:3px solid #ff0000;
-    display:flex;
-    align-items:center;
-    padding:0 20px;
-    gap:20px;
-}
-
-.left-icons{
-    display:flex;
-    gap:18px;
-}
-
-.left-icons img{
-    cursor:pointer;
-    transition:0.2s;
-}
-
-.left-icons img:hover{
-    transform:scale(1.15);
-}
-
-.header-title{
-    flex:1;
-    text-align:center;
-    font-size:2rem;
-    color:#ff0000;
-}
-
-.market-grid{
-    padding:30px;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:25px;
-}
-
-.market-card{
-    background:#fff;
-    color:#000;
-    padding:20px;
-    border:2px solid #ff0000;
-}
-
-.card-img{
-    width:100%;
-    height:180px;
-    object-fit:cover;
-    margin-bottom:15px;
-    background:#ddd;
-}
-
-.reason-select{
-    width:100%;
-    margin-top:15px;
-    padding:10px;
-    background:#111;
-    color:#ff0000;
-    border:1px solid #ff0000;
-    font-family:'Ax-Regular';
-}
-
-.abandon-btn{
-    width:100%;
-    margin-top:15px;
-    padding:10px;
-    background:#ff0000;
-    color:#000;
-    border:none;
-    cursor:pointer;
-    font-family:'Ax-Regular';
-}
-
-.complete-btn{
-    width:100%;
-    margin-top:10px;
-    padding:10px;
-    background:#000;
-    color:#ff0000;
-    border:none;
-    cursor:pointer;
-    font-family:'Ax-Regular';
-}
-
-.back-btn{
-    position:fixed;
-    bottom:20px;
-    left:20px;
-
-    background:#ff0000;
-    color:#000;
-
-    border:none;
-    padding:12px 20px;
-
-    font-family:'Ax-Regular';
-    cursor:pointer;
-}
-
-.back-btn:hover{
-    transform:scale(1.05);
-}
-
-.empty-text{
-    width:100%;
-    text-align:center;
-    font-size:2rem;
-    color:#ff0000;
-    margin-top:50px;
-}
-
+@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;min-height:100vh}
+.top-bar{height:75px;background:#0a0a0a;border-bottom:3px solid #ff0000;display:flex;align-items:center;padding:0 20px;gap:20px}
+.left-icons{display:flex;gap:18px}.left-icons img{cursor:pointer;transition:.2s}.left-icons img:hover{transform:scale(1.15)}
+.header-title{flex:1;text-align:center;font-size:2rem;color:#ff0000}
+.market-grid{padding:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px;padding-bottom:100px}
+.market-card{background:#fff;color:#000;padding:20px;border:2px solid #ff0000}.card-img{width:100%;height:180px;object-fit:cover;margin-bottom:15px;background:#ddd}
+.reason-select{width:100%;margin-top:15px;padding:10px;background:#111;color:#ff0000;border:1px solid #ff0000;font-family:'Ax-Regular'}
+.abandon-btn,.complete-btn{width:100%;margin-top:15px;padding:10px;cursor:pointer;font-family:'Ax-Regular'}.abandon-btn{background:#ff0000;color:#000;border:none}.complete-btn{background:#000;color:#ff0000;border:2px solid #ff0000}
+.back-btn{position:fixed;bottom:20px;left:20px;background:#ff0000;color:#000;border:none;padding:12px 20px;font-family:'Ax-Regular';cursor:pointer;z-index:1000}.back-btn:hover{transform:scale(1.05)}
+.empty-text,.loading{width:100%;text-align:center;font-size:2rem;color:#ff0000;margin-top:50px}
+.error{width:100%;text-align:center;color:#ff0000;margin-top:50px;font-size:1.2rem}
 </style>
-
 </head>
 <body>
-
 <div class="top-bar">
-
-    <div class="left-icons">
-
-        <img
-            src="file.png"
-            width="40"
-            onclick="window.location.href='filepage.html'"
-        >
-
-        <img
-            src="hunterid.png"
-            width="45"
-            onclick="window.location.href='hunterinfo.html'"
-        >
-
-        <img
-            src="Iconecontrat.png"
-            width="45"
-            onclick="window.location.href='Contrats.html'"
-        >
-
-    </div>
-
-    <div class="header-title">
-        MY CONTRACTS
-    </div>
-
+<div class="left-icons">
+<img src="file.png" width="40" height="35" onclick="window.location.replace('filepage.html')">
+<img src="Hunterid.png" width="45" height="35" onclick="window.location.replace('hunterinfo.html')">
+<img src="Iconecontrat.png" width="45" height="40" onclick="window.location.replace('Contrats.html')">
 </div>
-
-<div
-    id="contracts-container"
-    class="market-grid"
-></div>
-
+<div class="header-title">MY CONTRACTS</div>
+</div>
+<div id="contracts-container" class="market-grid"><div class="loading">LOADING...</div></div>
+<button class="back-btn" onclick="window.location.replace('Market.html')">← MARKET</button>
 <script>
+const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
+const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let user=null;
+let profile=null;
+let contracts=[];
+let announcements=[];
 
-const currentUser =
-    localStorage.getItem('ax_user');
-
-if(!currentUser){
-
-    window.location.href =
-        'index.html';
-
+async function start(){
+    const {data,error}=await db.auth.getSession();
+    if(error||!data.session){window.location.replace('index.html');return}
+    user=data.session.user;
+    const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,is_admin').eq('id',user.id).single();
+    if(profileError||!profileData){await db.auth.signOut();window.location.replace('index.html');return}
+    profile=profileData;
+    localStorage.setItem('ax_user',profile.username);
+    await loadContracts();
 }
 
-let announcements =
-    JSON.parse(
-        localStorage.getItem(
-            'ax_announcements'
-        )
-    ) || [];
+async function loadContracts(){
+    const {data:contractData,error:contractError}=await db.from('contracts').select('id,announcement_id,hunter_id,created_at').eq('hunter_id',user.id).order('created_at',{ascending:false});
+    if(contractError){console.error(contractError);document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACTS</div>';return}
+    contracts=contractData||[];
+    const ids=contracts.map(c=>c.announcement_id).filter(Boolean);
+    if(!ids.length){announcements=[];renderContracts();return}
+    const {data:announcementData,error:announcementError}=await db.from('announcements').select('*').in('id',ids);
+    if(announcementError){console.error(announcementError);document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACT DETAILS</div>';return}
+    announcements=announcementData||[];
+    renderContracts();
+}
 
 function renderContracts(){
-
-    const container =
-        document.getElementById(
-            'contracts-container'
-        );
-
-    container.innerHTML = '';
-
-    const myContracts =
-        announcements.filter(
-            ann =>
-            ann.taken === true &&
-            ann.hunter === currentUser
-        );
-
-    if(myContracts.length === 0){
-
-        container.innerHTML = `
-            <div class="empty-text">
-                NO ACTIVE CONTRACTS
-            </div>
-        `;
-
-        return;
-    }
-
-    myContracts.forEach(contract => {
-
-        container.innerHTML += `
-            <div class="market-card">
-
-                ${
-                    contract.image
-                    ? `<img src="${contract.image}" class="card-img">`
-                    : `<div class="card-img"></div>`
-                }
-
-                <h2>
-                    ${contract.title}
-                </h2>
-
-                <p style="margin:15px 0;">
-                    ${contract.desc}
-                </p>
-
-                <p>
-                    <strong>Reward :</strong>
-                    ${contract.reward}
-                </p>
-                        <select
-                    class="reason-select"
-                    id="reason-${contract.title}"
-                >
-
-                    <option>
-                        Mission too difficult
-                    </option>
-
-                    <option>
-                        Reward too low
-                    </option>
-
-                    <option>
-                        Lack of time
-                    </option>
-
-                    <option>
-                        Personal reasons
-                    </option>
-
-                    <option>
-                        Selection mistake
-                    </option>
-
-                    <option>
-                        Health issues
-                    </option>
-
-                    <option>
-                        I accidentally fucked the alien
-                    </option>
-
-                </select>
-
-                <button
-                    class="abandon-btn"
-                    onclick="abandonContract('${contract.title}')"
-                >
-                    ABANDON
-                </button>
-
-                <button
-                    class="complete-btn"
-                    onclick="completeContract('${contract.title}')"
-                >
-                    CONTRACT COMPLETED
-                </button>
-
-            </div>
-        `;
-
+    const container=document.getElementById('contracts-container');
+    container.innerHTML='';
+    if(!contracts.length){container.innerHTML='<div class="empty-text">NO ACTIVE CONTRACTS</div>';return}
+    contracts.forEach(contract=>{
+        const ann=announcements.find(a=>a.id===contract.announcement_id);
+        if(!ann)return;
+        const card=document.createElement('div');card.className='market-card';
+        if(ann.image_url){const img=document.createElement('img');img.src=ann.image_url;img.className='card-img';card.appendChild(img)}else{const empty=document.createElement('div');empty.className='card-img';card.appendChild(empty)}
+        const title=document.createElement('h2');title.textContent=ann.title||'Untitled contract';card.appendChild(title);
+        const desc=document.createElement('p');desc.style.margin='15px 0';desc.textContent=ann.description||'';card.appendChild(desc);
+        const reward=document.createElement('p');reward.innerHTML='<strong>Reward :</strong> '+escapeHtml(ann.reward||'Not specified');card.appendChild(reward);
+        const select=document.createElement('select');select.className='reason-select';select.id='reason-'+contract.id;
+        ['Mission too difficult','Reward too low','Lack of time','Personal reasons','Selection mistake','Health issues','I accidentally fucked the alien'].forEach(reason=>{const option=document.createElement('option');option.textContent=reason;select.appendChild(option)});
+        card.appendChild(select);
+        const abandon=document.createElement('button');abandon.className='abandon-btn';abandon.textContent='ABANDON';abandon.onclick=()=>abandonContract(contract.id,ann.id);card.appendChild(abandon);
+        const complete=document.createElement('button');complete.className='complete-btn';complete.textContent='CONTRACT COMPLETED';complete.onclick=()=>completeContract(contract.id,ann.id);card.appendChild(complete);
+        container.appendChild(card);
     });
-
 }
 
-function abandonContract(title){
+function escapeHtml(value){const div=document.createElement('div');div.textContent=value;return div.innerHTML}
 
-    const reason =
-        document.getElementById(
-            `reason-${title}`
-        ).value;
-
-    if(
-        !confirm(
-            "Abandon this contract?\n\nReason: " +
-            reason
-        )
-    ){
-        return;
-    }
-
-    announcements.forEach(ann => {
-
-        if(ann.title === title){
-
-            ann.taken = false;
-            ann.hunter = null;
-
-        }
-
-    });
-
-    localStorage.setItem(
-        'ax_announcements',
-        JSON.stringify(
-            announcements
-        )
-    );
-
-    renderContracts();
+async function abandonContract(contractId,announcementId){
+    const reason=document.getElementById('reason-'+contractId)?.value||'Not specified';
+    if(!confirm('Abandon this contract?\n\nReason: '+reason))return;
+    const {error:updateError}=await db.from('announcements').update({taken:false,hunter_id:null,hunter_username:null}).eq('id',announcementId);
+    if(updateError){console.error(updateError);alert('ABANDON ERROR:\n\n'+updateError.message);return}
+    const {error:deleteError}=await db.from('contracts').delete().eq('id',contractId).eq('hunter_id',user.id);
+    if(deleteError){console.error(deleteError);alert('CONTRACT CLEANUP ERROR:\n\n'+deleteError.message);return}
+    const abandoned=JSON.parse(localStorage.getItem('ax_abandoned_contracts')||'[]');
+    const ann=announcements.find(a=>a.id===announcementId);
+    abandoned.push({title:ann?.title||'Unknown',hunter:user.id,hunterUsername:profile.username,reason,date:new Date().toISOString()});
+    localStorage.setItem('ax_abandoned_contracts',JSON.stringify(abandoned));
+    await loadContracts();
 }
 
-function completeContract(title){
-
-    if(
-        !confirm(
-            "Mark this contract as completed?"
-        )
-    ){
-        return;
-    }
-
-    let completedContracts =
-        JSON.parse(
-            localStorage.getItem(
-                'ax_completed_contracts'
-            )
-        ) || [];
-
-    const contract =
-        announcements.find(
-            ann => ann.title === title
-        );
-
-    if(contract){
-
-        completedContracts.push({
-            ...contract,
-            completedBy: currentUser,
-            completedDate:
-                new Date().toLocaleDateString()
-        });
-
-        localStorage.setItem(
-            'ax_completed_contracts',
-            JSON.stringify(
-                completedContracts
-            )
-        );
-    }
-
-    announcements =
-        announcements.filter(
-            ann => ann.title !== title
-        );
-
-    localStorage.setItem(
-        'ax_announcements',
-        JSON.stringify(
-            announcements
-        )
-    );
-
-    renderContracts();
+async function completeContract(contractId,announcementId){
+    if(!confirm('Mark this contract as completed?'))return;
+    const ann=announcements.find(a=>a.id===announcementId);
+    const {error}=await db.from('contracts').delete().eq('id',contractId).eq('hunter_id',user.id);
+    if(error){console.error(error);alert('COMPLETE ERROR:\n\n'+error.message);return}
+    const completed=JSON.parse(localStorage.getItem('ax_completed_contracts')||'[]');
+    completed.push({...ann,completedBy:user.id,completedUsername:profile.username,completedDate:new Date().toISOString()});
+    localStorage.setItem('ax_completed_contracts',JSON.stringify(completed));
+    const {error:updateError}=await db.from('announcements').update({taken:false,hunter_id:null,hunter_username:null}).eq('id',announcementId);
+    if(updateError)console.error('ANNOUNCEMENT RESET ERROR:',updateError);
+    await loadContracts();
 }
-    renderContracts();
 
+start();
 </script>
-
-<button
-    class="back-btn"
-    onclick="window.location.href='Market.html'"
->
-    ← MARKET
-</button>
-
 </body>
 </html>
