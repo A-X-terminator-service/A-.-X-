@@ -7,17 +7,280 @@
 <div class="main-container"><div class="left-panel"><img src="logo2.png" alt="A.X"></div><div class="market-grid" id="market-grid"><div class="loading">LOADING...</div></div></div><button class="admin-btn" id="admin-btn" onclick="showPostModal()">+ PUBLISH CONTRACT</button>
 <div id="post-modal" class="modal"><div class="modal-content"><h2 id="modal-heading">NEW ANNOUNCEMENT</h2><input type="text" id="modal-title" placeholder="Title.."><textarea id="modal-desc" placeholder="Description.."></textarea><input type="text" id="modal-reward" placeholder="Reward.."><input type="file" id="modal-image" accept="image/*"><div class="modal-buttons"><button class="cancel-btn" onclick="closeModal()">CANCEL</button><button class="publish-btn" id="modal-submit-btn" onclick="publishPost()">PUBLISH</button></div></div></div>
 <script>
-const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let user=null,profile=null,announcements=[],editingAnnouncementId=null;
-async function startMarket(){const {data,error}=await db.auth.getSession();if(error||!data.session){window.location.replace('index.html');return}user=data.session.user;const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,created_at,is_admin').eq('id',user.id).single();if(profileError||!profileData){console.error('PROFILE ERROR:',profileError);await db.auth.signOut();window.location.replace('index.html');return}profile=profileData;localStorage.setItem('ax_user',profile.username);document.getElementById('current-user').textContent=profile.username;document.getElementById('admin-btn').style.display=profile.is_admin===true?'block':'none';await loadAnnouncements()}
-async function loadAnnouncements(){const {data,error}=await db.from('announcements').select('*').order('created_at',{ascending:false});if(error){console.error('ANNOUNCEMENT ERROR:',error);document.getElementById('market-grid').innerHTML='<p>ERROR LOADING MARKET</p>';return}announcements=data||[];renderAnnouncements()}
-function renderAnnouncements(){const grid=document.getElementById('market-grid');grid.innerHTML='';if(!announcements.length){grid.innerHTML='<p>NO CONTRACTS AVAILABLE</p>';return}announcements.forEach(announcement=>{const card=document.createElement('div');card.className='market-card';if(profile?.is_admin===true){const edit=document.createElement('button');edit.className='edit-btn';edit.textContent='EDIT';edit.onclick=()=>editAnnouncement(announcement.id);card.appendChild(edit)}if(announcement.image_url){const img=document.createElement('img');img.src=announcement.image_url;img.className='card-img';img.alt=announcement.title||'Announcement';card.appendChild(img)}else{const empty=document.createElement('div');empty.className='card-img';card.appendChild(empty)}const title=document.createElement('h2');title.textContent=announcement.title;card.appendChild(title);const desc=document.createElement('p');desc.style.margin='15px 0';desc.textContent=announcement.description||'';card.appendChild(desc);const reward=document.createElement('p');reward.textContent='Reward : '+(announcement.reward||'Not specified');card.appendChild(reward);if(announcement.taken){const taken=document.createElement('div');taken.className='taken';taken.textContent='Mission accepted by: '+(announcement.hunter_username||'Unknown');card.appendChild(taken)}else{const actions=document.createElement('div');actions.className='action-buttons';const accept=document.createElement('button');accept.className='accept-btn';accept.textContent='ACCEPT';accept.onclick=()=>acceptMission(announcement.id);actions.appendChild(accept);if(profile?.is_admin===true){const del=document.createElement('button');del.className='delete-btn';del.textContent='DELETE';del.onclick=()=>deleteAnnouncement(announcement.id);actions.appendChild(del)}card.appendChild(actions)}grid.appendChild(card)})}
-function showPostModal(){if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');editingAnnouncementId=null;document.getElementById('modal-heading').textContent='NEW ANNOUNCEMENT';document.getElementById('modal-submit-btn').textContent='PUBLISH';document.getElementById('modal-title').value='';document.getElementById('modal-desc').value='';document.getElementById('modal-reward').value='';document.getElementById('modal-image').value='';document.getElementById('post-modal').style.display='flex'}
-function editAnnouncement(id){if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');const announcement=announcements.find(item=>item.id===id);if(!announcement)return alert('Announcement not found.');editingAnnouncementId=id;document.getElementById('modal-heading').textContent='EDIT ANNOUNCEMENT';document.getElementById('modal-submit-btn').textContent='SAVE CHANGES';document.getElementById('modal-title').value=announcement.title||'';document.getElementById('modal-desc').value=announcement.description||'';document.getElementById('modal-reward').value=announcement.reward||'';document.getElementById('modal-image').value='';document.getElementById('post-modal').style.display='flex'}
-function closeModal(){document.getElementById('post-modal').style.display='none';editingAnnouncementId=null}
-async function publishPost(){if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');const title=document.getElementById('modal-title').value.trim(),description=document.getElementById('modal-desc').value.trim(),reward=document.getElementById('modal-reward').value.trim(),file=document.getElementById('modal-image').files[0];if(!title)return alert('Title required.');if(editingAnnouncementId){const updateData={title,description,reward};if(file){try{updateData.image_url=await fileToDataURL(file)}catch(e){console.error(e);return alert('Could not read image.')}}const {error}=await db.from('announcements').update(updateData).eq('id',editingAnnouncementId);if(error){console.error(error);return alert('EDIT ERROR:\n\n'+error.message)}closeModal();await loadAnnouncements();return alert('ANNOUNCEMENT UPDATED.')}let image_url=null;if(file){try{image_url=await fileToDataURL(file)}catch(e){console.error(e);return alert('Could not read image.')}}const {error}=await db.from('announcements').insert({title,description,reward,image_url,taken:false,hunter_id:null,hunter_username:null,created_by:user.id});if(error){console.error(error);return alert('PUBLISH ERROR:\n\n'+error.message)}closeModal();await loadAnnouncements();alert('CONTRACT PUBLISHED.')}
-function fileToDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(file)})}
-async function acceptMission(id){if(!user)return alert('You must be logged in.');const announcement=announcements.find(item=>item.id===id);if(!announcement)return alert('Announcement not found.');if(announcement.taken)return alert('Mission already taken.');if(!confirm('Accept this contract?'))return;const {data,error}=await db.rpc('accept_contract',{p_announcement_id:id});if(error){console.error(error);return alert('ACCEPT ERROR:\n\n'+error.message)}console.log('Contract created:',data);await loadAnnouncements();alert('MISSION ACCEPTED.')}
-async function deleteAnnouncement(id){if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');if(!confirm('Delete this announcement?'))return;const {error}=await db.from('announcements').delete().eq('id',id);if(error){console.error(error);return alert('DELETE ERROR:\n\n'+error.message)}await loadAnnouncements()}
-async function logout(){try{const {error}=await db.auth.signOut();if(error)console.error('LOGOUT ERROR:',error)}catch(e){console.error('LOGOUT ERROR:',e)}localStorage.removeItem('ax_user');sessionStorage.clear();window.location.replace('index.html')}
-document.getElementById('searchBar').addEventListener('input',event=>{const search=event.target.value.toLowerCase().trim();document.querySelectorAll('.market-card').forEach(card=>{card.style.display=card.textContent.toLowerCase().includes(search)?'block':'none'})});startMarket();
+const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
+const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let user=null,profile=null,announcements=[],editingAnnouncementId=null;
+
+async function startMarket(){
+    const {data,error}=await db.auth.getSession();
+    if(error||!data.session){window.location.replace('index.html');return}
+
+    user=data.session.user;
+
+    const {data:profileData,error:profileError}=await db
+        .from('Profiles')
+        .select('id,username,created_at,is_admin')
+        .eq('id',user.id)
+        .single();
+
+    if(profileError||!profileData){
+        console.error('PROFILE ERROR:',profileError);
+        await db.auth.signOut();
+        window.location.replace('index.html');
+        return;
+    }
+
+    profile=profileData;
+    document.getElementById('current-user').textContent=profile.username;
+    document.getElementById('admin-btn').style.display=profile.is_admin===true?'block':'none';
+    await loadAnnouncements();
+}
+
+async function loadAnnouncements(){
+    const {data,error}=await db
+        .from('announcements')
+        .select('*')
+        .order('created_at',{ascending:false});
+
+    if(error){
+        console.error('ANNOUNCEMENT ERROR:',error);
+        document.getElementById('market-grid').innerHTML='<p>ERROR LOADING MARKET</p>';
+        return;
+    }
+
+    announcements=data||[];
+    renderAnnouncements();
+}
+
+function renderAnnouncements(){
+    const grid=document.getElementById('market-grid');
+    grid.innerHTML='';
+
+    if(!announcements.length){
+        grid.innerHTML='<p>NO CONTRACTS AVAILABLE</p>';
+        return;
+    }
+
+    announcements.forEach(announcement=>{
+        const card=document.createElement('div');
+        card.className='market-card';
+
+        if(profile?.is_admin===true){
+            const edit=document.createElement('button');
+            edit.className='edit-btn';
+            edit.textContent='EDIT';
+            edit.onclick=()=>editAnnouncement(announcement.id);
+            card.appendChild(edit);
+        }
+
+        if(announcement.image_url){
+            const img=document.createElement('img');
+            img.src=announcement.image_url;
+            img.className='card-img';
+            img.alt=announcement.title||'Announcement';
+            card.appendChild(img);
+        }else{
+            const empty=document.createElement('div');
+            empty.className='card-img';
+            card.appendChild(empty);
+        }
+
+        const title=document.createElement('h2');
+        title.textContent=announcement.title;
+        card.appendChild(title);
+
+        const desc=document.createElement('p');
+        desc.style.margin='15px 0';
+        desc.textContent=announcement.description||'';
+        card.appendChild(desc);
+
+        const reward=document.createElement('p');
+        reward.textContent='Reward : '+(announcement.reward||'Not specified');
+        card.appendChild(reward);
+
+        if(announcement.taken){
+            const taken=document.createElement('div');
+            taken.className='taken';
+            taken.textContent='Mission accepted by: '+(announcement.hunter_username||'Unknown');
+            card.appendChild(taken);
+        }else{
+            const actions=document.createElement('div');
+            actions.className='action-buttons';
+
+            const accept=document.createElement('button');
+            accept.className='accept-btn';
+            accept.textContent='ACCEPT';
+            accept.onclick=()=>acceptMission(announcement.id);
+            actions.appendChild(accept);
+
+            if(profile?.is_admin===true){
+                const del=document.createElement('button');
+                del.className='delete-btn';
+                del.textContent='DELETE';
+                del.onclick=()=>deleteAnnouncement(announcement.id);
+                actions.appendChild(del);
+            }
+
+            card.appendChild(actions);
+        }
+
+        grid.appendChild(card);
+    });
+}
+
+function showPostModal(){
+    if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
+    editingAnnouncementId=null;
+    document.getElementById('modal-heading').textContent='NEW ANNOUNCEMENT';
+    document.getElementById('modal-submit-btn').textContent='PUBLISH';
+    document.getElementById('modal-title').value='';
+    document.getElementById('modal-desc').value='';
+    document.getElementById('modal-reward').value='';
+    document.getElementById('modal-image').value='';
+    document.getElementById('post-modal').style.display='flex';
+}
+
+function editAnnouncement(id){
+    if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
+    const announcement=announcements.find(item=>item.id===id);
+    if(!announcement)return alert('Announcement not found.');
+
+    editingAnnouncementId=id;
+    document.getElementById('modal-heading').textContent='EDIT ANNOUNCEMENT';
+    document.getElementById('modal-submit-btn').textContent='SAVE CHANGES';
+    document.getElementById('modal-title').value=announcement.title||'';
+    document.getElementById('modal-desc').value=announcement.description||'';
+    document.getElementById('modal-reward').value=announcement.reward||'';
+    document.getElementById('modal-image').value='';
+    document.getElementById('post-modal').style.display='flex';
+}
+
+function closeModal(){
+    document.getElementById('post-modal').style.display='none';
+    editingAnnouncementId=null;
+}
+
+async function publishPost(){
+    if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
+
+    const title=document.getElementById('modal-title').value.trim();
+    const description=document.getElementById('modal-desc').value.trim();
+    const reward=document.getElementById('modal-reward').value.trim();
+    const file=document.getElementById('modal-image').files[0];
+
+    if(!title)return alert('Title required.');
+
+    if(editingAnnouncementId){
+        const updateData={title,description,reward};
+
+        if(file){
+            try{updateData.image_url=await fileToDataURL(file)}
+            catch(e){console.error(e);return alert('Could not read image.')}
+        }
+
+        const {error}=await db
+            .from('announcements')
+            .update(updateData)
+            .eq('id',editingAnnouncementId);
+
+        if(error){
+            console.error(error);
+            return alert('EDIT ERROR:\n\n'+error.message);
+        }
+
+        closeModal();
+        await loadAnnouncements();
+        return alert('ANNOUNCEMENT UPDATED.');
+    }
+
+    let image_url=null;
+    if(file){
+        try{image_url=await fileToDataURL(file)}
+        catch(e){console.error(e);return alert('Could not read image.')}
+    }
+
+    const {error}=await db.from('announcements').insert({
+        title,
+        description,
+        reward,
+        image_url,
+        taken:false,
+        hunter_id:null,
+        hunter_username:null,
+        created_by:user.id
+    });
+
+    if(error){
+        console.error(error);
+        return alert('PUBLISH ERROR:\n\n'+error.message);
+    }
+
+    closeModal();
+    await loadAnnouncements();
+    alert('CONTRACT PUBLISHED.');
+}
+
+function fileToDataURL(file){
+    return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(reader.result);
+        reader.onerror=()=>reject(reader.error);
+        reader.readAsDataURL(file);
+    });
+}
+
+async function acceptMission(id){
+    if(!user)return alert('You must be logged in.');
+
+    const announcement=announcements.find(item=>item.id===id);
+    if(!announcement)return alert('Announcement not found.');
+    if(announcement.taken)return alert('Mission already taken.');
+    if(!confirm('Accept this contract?'))return;
+
+    const {data,error}=await db.rpc('accept_contract',{p_announcement_id:id});
+
+    if(error){
+        console.error(error);
+        return alert('ACCEPT ERROR:\n\n'+error.message);
+    }
+
+    console.log('Contract created:',data);
+    await loadAnnouncements();
+    alert('MISSION ACCEPTED.');
+}
+
+async function deleteAnnouncement(id){
+    if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
+    if(!confirm('Delete this announcement?'))return;
+
+    const {error}=await db.from('announcements').delete().eq('id',id);
+
+    if(error){
+        console.error(error);
+        return alert('DELETE ERROR:\n\n'+error.message);
+    }
+
+    await loadAnnouncements();
+}
+
+async function logout(){
+    try{
+        const {error}=await db.auth.signOut();
+        if(error)console.error('LOGOUT ERROR:',error);
+    }catch(e){
+        console.error('LOGOUT ERROR:',e);
+    }
+
+    window.location.replace('index.html');
+}
+
+document.getElementById('searchBar').addEventListener('input',event=>{
+    const search=event.target.value.toLowerCase().trim();
+    document.querySelectorAll('.market-card').forEach(card=>{
+        card.style.display=card.textContent.toLowerCase().includes(search)?'block':'none';
+    });
+});
+
+startMarket();
 </script></body></html>
