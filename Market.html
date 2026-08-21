@@ -1,11 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>A.X MARKET</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
-@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;min-height:100vh;overflow-y:auto}.top-bar{height:75px;background:#0a0a0a;border-bottom:3px solid #ff0000;display:flex;align-items:center;padding:0 20px;gap:20px}.left-icons{display:flex;gap:18px}.left-icons img{cursor:pointer;transition:.2s}.left-icons img:hover{transform:scale(1.15)}.search-bar{flex:1;height:48px;background:#111;border:2px solid #ff0000;color:#ff0000;padding:0 20px;font-size:1.3rem;font-family:'Ax-Regular';outline:none}.profile{display:flex;align-items:center;gap:12px}.profile-img{width:48px;height:48px;border:2px solid #ff0000;object-fit:cover}.logout-btn{background:#ff0000;color:#000;border:none;padding:8px 14px;cursor:pointer;font-family:'Ax-Regular'}.main-container{display:flex;min-height:calc(100vh - 75px)}.left-panel{width:300px;background:#000;padding:2px}.left-panel img{max-width:105%;max-height:105%;object-fit:contain}.market-grid{flex:1;padding:30px;padding-bottom:180px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px}.market-card{position:relative;background:#fff;color:#000;padding:20px;min-height:340px}.card-img{width:100%;height:180px;object-fit:cover;background:#ddd;margin-bottom:15px}.admin-btn{position:fixed;bottom:20px;right:20px;background:#ff0000;color:#000;padding:15px 25px;font-size:1.4rem;border:none;cursor:pointer;font-family:'Ax-Regular';z-index:9999;display:none}.edit-btn{position:absolute;top:10px;right:10px;background:#ff0000;color:#000;border:none;padding:7px 12px;cursor:pointer;font-family:'Ax-Regular';font-size:13px;z-index:5}.edit-btn:hover{background:#000;color:#ff0000;border:1px solid #ff0000}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;justify-content:center;align-items:center}.modal-content{width:520px;max-width:90%;border:3px solid #ff0000;background:#000;padding:30px}.modal-content h2{text-align:center;margin-bottom:20px}.modal-content input,.modal-content textarea{width:100%;margin-bottom:15px;padding:12px;background:#111;border:1px solid #ff0000;color:#fff;font-family:'Ax-Regular'}.modal-content textarea{min-height:120px;resize:vertical}.modal-buttons{display:flex;gap:15px}.modal-buttons button{flex:1;padding:15px;cursor:pointer;font-family:'Ax-Regular'}.cancel-btn{background:transparent;color:#ff0000;border:2px solid #ff0000}.publish-btn{background:#ff0000;color:#000;border:none}.action-buttons{display:flex;gap:10px;margin-top:15px}.accept-btn,.delete-btn{flex:1;padding:8px;font-size:14px;cursor:pointer;font-family:'Ax-Regular'}.accept-btn{background:#111;color:#ff0000;border:2px solid #ff0000}.delete-btn{background:#ff0000;color:#000;border:none}.taken{color:red;font-weight:bold;margin-top:10px}.loading{font-size:1.5rem}
-</style></head><body>
-<div class="top-bar"><div class="left-icons"><img src="file.png" width="40" height="35" onclick="window.location.replace('filepage.html')"><img src="Hunterid.png" width="45" height="35" onclick="window.location.replace('hunterinfo.html')"><img src="Iconecontrat.png" width="45" height="40" onclick="window.location.replace('Contrats.html')"></div><input type="text" class="search-bar" placeholder="SEARCH..." id="searchBar"><div class="profile"><span id="current-user"></span><img src="pfp.jpg" class="profile-img"><button class="logout-btn" onclick="logout()">LOGOUT</button></div></div>
-<div class="main-container"><div class="left-panel"><img src="logo2.png" alt="A.X"></div><div class="market-grid" id="market-grid"><div class="loading">LOADING...</div></div></div><button class="admin-btn" id="admin-btn" onclick="showPostModal()">+ PUBLISH CONTRACT</button>
-<div id="post-modal" class="modal"><div class="modal-content"><h2 id="modal-heading">NEW ANNOUNCEMENT</h2><input type="text" id="modal-title" placeholder="Title.."><textarea id="modal-desc" placeholder="Description.."></textarea><input type="text" id="modal-reward" placeholder="Reward.."><input type="file" id="modal-image" accept="image/*"><div class="modal-buttons"><button class="cancel-btn" onclick="closeModal()">CANCEL</button><button class="publish-btn" id="modal-submit-btn" onclick="publishPost()">PUBLISH</button></div></div></div>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A.X MARKET</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;min-height:100vh;overflow-y:auto}
+.top-bar{height:75px;background:#0a0a0a;border-bottom:3px solid #ff0000;display:flex;align-items:center;padding:0 20px;gap:20px}
+.left-icons{display:flex;gap:18px}.left-icons img{cursor:pointer;transition:.2s}.left-icons img:hover{transform:scale(1.15)}
+.search-bar{flex:1;height:48px;background:#111;border:2px solid #ff0000;color:#ff0000;padding:0 20px;font-size:1.3rem;font-family:'Ax-Regular';outline:none}
+.profile{display:flex;align-items:center;gap:12px}.profile-img{width:48px;height:48px;border:2px solid #ff0000;object-fit:cover}.logout-btn{background:#ff0000;color:#000;border:none;padding:8px 14px;cursor:pointer;font-family:'Ax-Regular'}
+.main-container{display:flex;min-height:calc(100vh - 75px)}.left-panel{width:300px;background:#000;padding:2px}.left-panel img{max-width:105%;max-height:105%;object-fit:contain}
+.market-grid{flex:1;padding:30px;padding-bottom:180px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px}
+.market-card{position:relative;background:#fff;color:#000;padding:20px;min-height:340px}.card-img{width:100%;height:180px;object-fit:cover;background:#ddd;margin-bottom:15px}
+.admin-btn{position:fixed;bottom:20px;right:20px;background:#ff0000;color:#000;padding:15px 25px;font-size:1.2rem;border:none;cursor:pointer;font-family:'Ax-Regular';z-index:9999;display:none}
+.edit-btn{position:absolute;top:10px;right:10px;background:#ff0000;color:#000;border:none;padding:7px 12px;cursor:pointer;font-family:'Ax-Regular';font-size:13px;z-index:5}.edit-btn:hover{background:#000;color:#ff0000;border:1px solid #ff0000}
+.action-buttons{display:flex;gap:10px;margin-top:15px}.accept-btn,.delete-btn{flex:1;padding:8px;font-size:14px;cursor:pointer;font-family:'Ax-Regular'}.accept-btn{background:#111;color:#ff0000;border:2px solid #ff0000}.delete-btn{background:#ff0000;color:#000;border:none}
+.conditions{margin-top:15px;border-top:1px solid #aaa;padding-top:12px}.conditions h3{font-size:16px;margin-bottom:8px}.condition-line{margin:6px 0}.taken{color:red;font-weight:bold;margin-top:10px}
+.admin-panel{display:none;margin:25px 30px 0;border:2px solid #ff0000;background:#050505;padding:20px}.admin-panel h2{text-align:center;margin-bottom:20px}.review-card{border:1px solid #ff0000;padding:18px;margin-bottom:18px;color:#fff;background:#0a0a0a}.review-card h3{color:#ff0000;margin-bottom:8px}.review-meta{margin:8px 0;color:#aaa}.proof-image{max-width:100%;max-height:400px;display:block;margin:15px 0;border:1px solid #ff0000}.review-actions{display:flex;gap:10px;margin-top:15px}.approve-btn,.reject-btn{flex:1;padding:12px;border:none;cursor:pointer;font-family:'Ax-Regular'}.approve-btn{background:#ff0000;color:#000}.reject-btn{background:#000;color:#ff0000;border:2px solid #ff0000}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:1000;justify-content:center;align-items:center;overflow:auto}.modal-content{width:560px;max-width:92%;border:3px solid #ff0000;background:#000;padding:30px;margin:30px}.modal-content h2{text-align:center;margin-bottom:20px}.modal-content input,.modal-content textarea{width:100%;margin-bottom:15px;padding:12px;background:#111;border:1px solid #ff0000;color:#fff;font-family:'Ax-Regular'}.modal-content textarea{min-height:100px;resize:vertical}.condition-help{color:#aaa;font-size:13px;margin:-8px 0 15px}.modal-buttons{display:flex;gap:15px}.modal-buttons button{flex:1;padding:15px;cursor:pointer;font-family:'Ax-Regular'}.cancel-btn{background:transparent;color:#ff0000;border:2px solid #ff0000}.publish-btn{background:#ff0000;color:#000;border:none}.loading{font-size:1.5rem}.empty{font-size:1.5rem;padding:40px;text-align:center}
+</style>
+</head>
+<body>
+<div class="top-bar">
+<div class="left-icons"><img src="file.png" width="40" height="35" onclick="window.location.replace('filepage.html')"><img src="Hunterid.png" width="45" height="35" onclick="window.location.replace('hunterinfo.html')"><img src="Iconecontrat.png" width="45" height="40" onclick="window.location.replace('Contrats.html')"></div>
+<input type="text" class="search-bar" placeholder="SEARCH..." id="searchBar">
+<div class="profile"><span id="current-user"></span><img src="pfp.jpg" class="profile-img"><button class="logout-btn" onclick="logout()">LOGOUT</button></div>
+</div>
+<div id="admin-panel" class="admin-panel"><h2>CONTRACTS AWAITING VERIFICATION</h2><div id="review-list"></div></div>
+<div class="main-container"><div class="left-panel"><img src="logo2.png" alt="A.X"></div><div class="market-grid" id="market-grid"><div class="loading">LOADING...</div></div></div>
+<button class="admin-btn" id="admin-btn" onclick="showPostModal()">+ PUBLISH CONTRACT</button>
+<div id="post-modal" class="modal"><div class="modal-content">
+<h2 id="modal-heading">NEW CONTRACT</h2>
+<input type="text" id="modal-title" placeholder="Title..">
+<textarea id="modal-desc" placeholder="Description.."></textarea>
+<input type="text" id="modal-reward" placeholder="Reward..">
+<input type="number" id="modal-kills" min="0" value="1" placeholder="Kills awarded after approval">
+<textarea id="modal-conditions" placeholder="Condition 1&#10;Condition 2&#10;Condition 3"></textarea>
+<div class="condition-help">Write one condition per line. The Hunter must satisfy every condition and provide proof before an admin can approve the contract.</div>
+<input type="file" id="modal-image" accept="image/*">
+<div class="modal-buttons"><button class="cancel-btn" onclick="closeModal()">CANCEL</button><button class="publish-btn" id="modal-submit-btn" onclick="publishPost()">PUBLISH</button></div>
+</div></div>
 <script>
 const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
 const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';
@@ -13,274 +51,113 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let user=null,profile=null,announcements=[],editingAnnouncementId=null;
 
 async function startMarket(){
-    const {data,error}=await db.auth.getSession();
-    if(error||!data.session){window.location.replace('index.html');return}
-
-    user=data.session.user;
-
-    const {data:profileData,error:profileError}=await db
-        .from('Profiles')
-        .select('id,username,created_at,is_admin')
-        .eq('id',user.id)
-        .single();
-
-    if(profileError||!profileData){
-        console.error('PROFILE ERROR:',profileError);
-        await db.auth.signOut();
-        window.location.replace('index.html');
-        return;
-    }
-
-    profile=profileData;
-    document.getElementById('current-user').textContent=profile.username;
-    document.getElementById('admin-btn').style.display=profile.is_admin===true?'block':'none';
-    await loadAnnouncements();
+ const {data,error}=await db.auth.getSession();
+ if(error||!data.session){window.location.replace('index.html');return}
+ user=data.session.user;
+ const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,created_at,is_admin').eq('id',user.id).single();
+ if(profileError||!profileData){console.error(profileError);await db.auth.signOut();window.location.replace('index.html');return}
+ profile=profileData;
+ document.getElementById('current-user').textContent=profile.username;
+ document.getElementById('admin-btn').style.display=profile.is_admin===true?'block':'none';
+ if(profile.is_admin===true){document.getElementById('admin-panel').style.display='block';await loadReviews()}
+ await loadAnnouncements();
 }
 
 async function loadAnnouncements(){
-    const {data,error}=await db
-        .from('announcements')
-        .select('*')
-        .order('created_at',{ascending:false});
-
-    if(error){
-        console.error('ANNOUNCEMENT ERROR:',error);
-        document.getElementById('market-grid').innerHTML='<p>ERROR LOADING MARKET</p>';
-        return;
-    }
-
-    announcements=data||[];
-    renderAnnouncements();
+ const {data,error}=await db.from('announcements').select('*').eq('status','available').order('created_at',{ascending:false});
+ if(error){console.error(error);document.getElementById('market-grid').innerHTML='<p>ERROR LOADING MARKET</p>';return}
+ announcements=data||[];renderAnnouncements();
 }
 
 function renderAnnouncements(){
-    const grid=document.getElementById('market-grid');
-    grid.innerHTML='';
+ const grid=document.getElementById('market-grid');grid.innerHTML='';
+ if(!announcements.length){grid.innerHTML='<div class="empty">NO CONTRACTS AVAILABLE</div>';return}
+ announcements.forEach(announcement=>{
+  const card=document.createElement('div');card.className='market-card';
+  if(profile?.is_admin===true){const edit=document.createElement('button');edit.className='edit-btn';edit.textContent='EDIT';edit.onclick=()=>editAnnouncement(announcement.id);card.appendChild(edit)}
+  if(announcement.image_url){const img=document.createElement('img');img.src=announcement.image_url;img.className='card-img';img.alt=announcement.title||'Announcement';card.appendChild(img)}else{const empty=document.createElement('div');empty.className='card-img';card.appendChild(empty)}
+  const title=document.createElement('h2');title.textContent=announcement.title;card.appendChild(title);
+  const desc=document.createElement('p');desc.style.margin='15px 0';desc.textContent=announcement.description||'';card.appendChild(desc);
+  const reward=document.createElement('p');reward.textContent='Reward : '+(announcement.reward||'Not specified');card.appendChild(reward);
+  const conditions=document.createElement('div');conditions.className='conditions';const h=document.createElement('h3');h.textContent='CONDITIONS';conditions.appendChild(h);
+  const list=Array.isArray(announcement.conditions)?announcement.conditions:[];
+  if(!list.length){const p=document.createElement('p');p.textContent='No special conditions specified. Proof is still required.';conditions.appendChild(p)}
+  else list.forEach((condition,i)=>{const p=document.createElement('p');p.className='condition-line';p.textContent=(i+1)+'. '+condition;conditions.appendChild(p)});
+  card.appendChild(conditions);
+  const kills=document.createElement('p');kills.style.marginTop='10px';kills.textContent='Kills awarded after approval : '+(Number(announcement.required_kills)||0);card.appendChild(kills);
+  const actions=document.createElement('div');actions.className='action-buttons';
+  const accept=document.createElement('button');accept.className='accept-btn';accept.textContent='ACCEPT';accept.onclick=()=>acceptMission(announcement.id);actions.appendChild(accept);
+  if(profile?.is_admin===true){const del=document.createElement('button');del.className='delete-btn';del.textContent='DELETE';del.onclick=()=>deleteAnnouncement(announcement.id);actions.appendChild(del)}
+  card.appendChild(actions);grid.appendChild(card);
+ })
+}
 
-    if(!announcements.length){
-        grid.innerHTML='<p>NO CONTRACTS AVAILABLE</p>';
-        return;
-    }
+async function loadReviews(){
+ const {data,error}=await db.from('contracts').select('id,announcement_id,hunter_id,status,submitted_at,proof_text,proof_data,verification_note,announcements(title,description,reward,image_url,conditions,required_kills)').eq('status','pending_review').order('submitted_at',{ascending:true});
+ const list=document.getElementById('review-list');list.innerHTML='';
+ if(error){console.error(error);list.innerHTML='<p>ERROR LOADING REVIEWS</p>';return}
+ if(!data?.length){list.innerHTML='<p class="empty">NO CONTRACTS WAITING FOR VERIFICATION</p>';return}
+ data.forEach(contract=>{
+  const a=contract.announcements||{};const card=document.createElement('div');card.className='review-card';
+  card.innerHTML='<h3>'+escapeHtml(a.title||'Untitled contract')+'</h3><div class="review-meta">Hunter ID : '+escapeHtml(contract.hunter_id||'Unknown')+'<br>Submitted : '+escapeHtml(new Date(contract.submitted_at).toLocaleString())+'<br>Kills awarded : '+(Number(a.required_kills)||0)+'</div>';
+  const cond=document.createElement('div');cond.innerHTML='<strong>CONDITIONS</strong>';const ul=document.createElement('ul');(Array.isArray(a.conditions)?a.conditions:[]).forEach(c=>{const li=document.createElement('li');li.textContent=c;ul.appendChild(li)});cond.appendChild(ul);card.appendChild(cond);
+  if(contract.proof_text){const p=document.createElement('p');p.style.marginTop='12px';p.textContent='Hunter note: '+contract.proof_text;card.appendChild(p)}
+  if(contract.proof_data){const img=document.createElement('img');img.src=contract.proof_data;img.className='proof-image';img.alt='Completion proof';card.appendChild(img)}
+  const actions=document.createElement('div');actions.className='review-actions';const ok=document.createElement('button');ok.className='approve-btn';ok.textContent='APPROVE';ok.onclick=()=>approveContract(contract.id);const no=document.createElement('button');no.className='reject-btn';no.textContent='REJECT';no.onclick=()=>rejectContract(contract.id);actions.append(ok,no);card.appendChild(actions);list.appendChild(card)
+ })
+}
 
-    announcements.forEach(announcement=>{
-        const card=document.createElement('div');
-        card.className='market-card';
+async function approveContract(id){
+ const note=prompt('Optional verification note :','Verified by admin');if(note===null)return;
+ const {error}=await db.rpc('approve_contract',{p_contract_id:id,p_note:note});
+ if(error){console.error(error);return alert('APPROVAL ERROR:\n\n'+error.message)}
+ await loadReviews();await loadAnnouncements();alert('CONTRACT APPROVED. It is now permanently completed and removed from the Market.');
+}
 
-        if(profile?.is_admin===true){
-            const edit=document.createElement('button');
-            edit.className='edit-btn';
-            edit.textContent='EDIT';
-            edit.onclick=()=>editAnnouncement(announcement.id);
-            card.appendChild(edit);
-        }
-
-        if(announcement.image_url){
-            const img=document.createElement('img');
-            img.src=announcement.image_url;
-            img.className='card-img';
-            img.alt=announcement.title||'Announcement';
-            card.appendChild(img);
-        }else{
-            const empty=document.createElement('div');
-            empty.className='card-img';
-            card.appendChild(empty);
-        }
-
-        const title=document.createElement('h2');
-        title.textContent=announcement.title;
-        card.appendChild(title);
-
-        const desc=document.createElement('p');
-        desc.style.margin='15px 0';
-        desc.textContent=announcement.description||'';
-        card.appendChild(desc);
-
-        const reward=document.createElement('p');
-        reward.textContent='Reward : '+(announcement.reward||'Not specified');
-        card.appendChild(reward);
-
-        if(announcement.taken){
-            const taken=document.createElement('div');
-            taken.className='taken';
-            taken.textContent='Mission accepted by: '+(announcement.hunter_username||'Unknown');
-            card.appendChild(taken);
-        }else{
-            const actions=document.createElement('div');
-            actions.className='action-buttons';
-
-            const accept=document.createElement('button');
-            accept.className='accept-btn';
-            accept.textContent='ACCEPT';
-            accept.onclick=()=>acceptMission(announcement.id);
-            actions.appendChild(accept);
-
-            if(profile?.is_admin===true){
-                const del=document.createElement('button');
-                del.className='delete-btn';
-                del.textContent='DELETE';
-                del.onclick=()=>deleteAnnouncement(announcement.id);
-                actions.appendChild(del);
-            }
-
-            card.appendChild(actions);
-        }
-
-        grid.appendChild(card);
-    });
+async function rejectContract(id){
+ const note=prompt('Why is this contract rejected?');if(note===null||!note.trim())return alert('A rejection reason is required.');
+ const {error}=await db.rpc('reject_contract',{p_contract_id:id,p_note:note});
+ if(error){console.error(error);return alert('REJECTION ERROR:\n\n'+error.message)}
+ await loadReviews();alert('CONTRACT REJECTED. The Hunter can correct the proof and submit again.');
 }
 
 function showPostModal(){
-    if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
-    editingAnnouncementId=null;
-    document.getElementById('modal-heading').textContent='NEW ANNOUNCEMENT';
-    document.getElementById('modal-submit-btn').textContent='PUBLISH';
-    document.getElementById('modal-title').value='';
-    document.getElementById('modal-desc').value='';
-    document.getElementById('modal-reward').value='';
-    document.getElementById('modal-image').value='';
-    document.getElementById('post-modal').style.display='flex';
+ if(!profile||!profile.is_admin)return alert('ACCESS DENIED');editingAnnouncementId=null;
+ document.getElementById('modal-heading').textContent='NEW CONTRACT';document.getElementById('modal-submit-btn').textContent='PUBLISH';
+ document.getElementById('modal-title').value='';document.getElementById('modal-desc').value='';document.getElementById('modal-reward').value='';document.getElementById('modal-kills').value='1';document.getElementById('modal-conditions').value='';document.getElementById('modal-image').value='';document.getElementById('post-modal').style.display='flex';
 }
 
 function editAnnouncement(id){
-    if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
-    const announcement=announcements.find(item=>item.id===id);
-    if(!announcement)return alert('Announcement not found.');
-
-    editingAnnouncementId=id;
-    document.getElementById('modal-heading').textContent='EDIT ANNOUNCEMENT';
-    document.getElementById('modal-submit-btn').textContent='SAVE CHANGES';
-    document.getElementById('modal-title').value=announcement.title||'';
-    document.getElementById('modal-desc').value=announcement.description||'';
-    document.getElementById('modal-reward').value=announcement.reward||'';
-    document.getElementById('modal-image').value='';
-    document.getElementById('post-modal').style.display='flex';
+ if(!profile||!profile.is_admin)return alert('ACCESS DENIED');const a=announcements.find(x=>x.id===id);if(!a)return alert('Announcement not found.');editingAnnouncementId=id;
+ document.getElementById('modal-heading').textContent='EDIT CONTRACT';document.getElementById('modal-submit-btn').textContent='SAVE CHANGES';document.getElementById('modal-title').value=a.title||'';document.getElementById('modal-desc').value=a.description||'';document.getElementById('modal-reward').value=a.reward||'';document.getElementById('modal-kills').value=Number(a.required_kills)||0;document.getElementById('modal-conditions').value=(Array.isArray(a.conditions)?a.conditions:[]).join('\n');document.getElementById('modal-image').value='';document.getElementById('post-modal').style.display='flex';
 }
-
-function closeModal(){
-    document.getElementById('post-modal').style.display='none';
-    editingAnnouncementId=null;
-}
+function closeModal(){document.getElementById('post-modal').style.display='none';editingAnnouncementId=null}
+function fileToDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(file)})}
 
 async function publishPost(){
-    if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
-
-    const title=document.getElementById('modal-title').value.trim();
-    const description=document.getElementById('modal-desc').value.trim();
-    const reward=document.getElementById('modal-reward').value.trim();
-    const file=document.getElementById('modal-image').files[0];
-
-    if(!title)return alert('Title required.');
-
-    if(editingAnnouncementId){
-        const updateData={title,description,reward};
-
-        if(file){
-            try{updateData.image_url=await fileToDataURL(file)}
-            catch(e){console.error(e);return alert('Could not read image.')}
-        }
-
-        const {error}=await db
-            .from('announcements')
-            .update(updateData)
-            .eq('id',editingAnnouncementId);
-
-        if(error){
-            console.error(error);
-            return alert('EDIT ERROR:\n\n'+error.message);
-        }
-
-        closeModal();
-        await loadAnnouncements();
-        return alert('ANNOUNCEMENT UPDATED.');
-    }
-
-    let image_url=null;
-    if(file){
-        try{image_url=await fileToDataURL(file)}
-        catch(e){console.error(e);return alert('Could not read image.')}
-    }
-
-    const {error}=await db.from('announcements').insert({
-        title,
-        description,
-        reward,
-        image_url,
-        taken:false,
-        hunter_id:null,
-        hunter_username:null,
-        created_by:user.id
-    });
-
-    if(error){
-        console.error(error);
-        return alert('PUBLISH ERROR:\n\n'+error.message);
-    }
-
-    closeModal();
-    await loadAnnouncements();
-    alert('CONTRACT PUBLISHED.');
-}
-
-function fileToDataURL(file){
-    return new Promise((resolve,reject)=>{
-        const reader=new FileReader();
-        reader.onload=()=>resolve(reader.result);
-        reader.onerror=()=>reject(reader.error);
-        reader.readAsDataURL(file);
-    });
+ if(!profile||!profile.is_admin)return alert('ACCESS DENIED');
+ const title=document.getElementById('modal-title').value.trim(),description=document.getElementById('modal-desc').value.trim(),reward=document.getElementById('modal-reward').value.trim();
+ const required_kills=Math.max(0,parseInt(document.getElementById('modal-kills').value,10)||0);
+ const conditions=document.getElementById('modal-conditions').value.split('\n').map(x=>x.trim()).filter(Boolean);
+ const file=document.getElementById('modal-image').files[0];if(!title)return alert('Title required.');
+ if(editingAnnouncementId){
+  const updateData={title,description,reward,required_kills,conditions};if(file){try{updateData.image_url=await fileToDataURL(file)}catch(e){return alert('Could not read image.')}}
+  const {error}=await db.from('announcements').update(updateData).eq('id',editingAnnouncementId);if(error)return alert('EDIT ERROR:\n\n'+error.message);closeModal();await loadAnnouncements();return alert('CONTRACT UPDATED.');
+ }
+ let image_url=null;if(file){try{image_url=await fileToDataURL(file)}catch(e){return alert('Could not read image.')}}
+ const {error}=await db.from('announcements').insert({title,description,reward,image_url,taken:false,hunter_id:null,hunter_username:null,created_by:user.id,conditions,required_kills,status:'available'});
+ if(error){console.error(error);return alert('PUBLISH ERROR:\n\n'+error.message)}closeModal();await loadAnnouncements();alert('CONTRACT PUBLISHED.');
 }
 
 async function acceptMission(id){
-    if(!user)return alert('You must be logged in.');
-
-    const announcement=announcements.find(item=>item.id===id);
-    if(!announcement)return alert('Announcement not found.');
-    if(announcement.taken)return alert('Mission already taken.');
-    if(!confirm('Accept this contract?'))return;
-
-    const {data,error}=await db.rpc('accept_contract',{p_announcement_id:id});
-
-    if(error){
-        console.error(error);
-        return alert('ACCEPT ERROR:\n\n'+error.message);
-    }
-
-    console.log('Contract created:',data);
-    await loadAnnouncements();
-    alert('MISSION ACCEPTED.');
+ const a=announcements.find(x=>x.id===id);if(!a)return alert('Contract not found.');if(!confirm('Accept this contract?'))return;
+ const {error}=await db.rpc('accept_contract',{p_announcement_id:id});if(error){console.error(error);return alert('ACCEPT ERROR:\n\n'+error.message)}await loadAnnouncements();alert('MISSION ACCEPTED. The contract is now assigned to you and disappears from the Market.');
 }
-
-async function deleteAnnouncement(id){
-    if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
-    if(!confirm('Delete this announcement?'))return;
-
-    const {error}=await db.from('announcements').delete().eq('id',id);
-
-    if(error){
-        console.error(error);
-        return alert('DELETE ERROR:\n\n'+error.message);
-    }
-
-    await loadAnnouncements();
-}
-
-async function logout(){
-    try{
-        const {error}=await db.auth.signOut();
-        if(error)console.error('LOGOUT ERROR:',error);
-    }catch(e){
-        console.error('LOGOUT ERROR:',e);
-    }
-
-    window.location.replace('index.html');
-}
-
-document.getElementById('searchBar').addEventListener('input',event=>{
-    const search=event.target.value.toLowerCase().trim();
-    document.querySelectorAll('.market-card').forEach(card=>{
-        card.style.display=card.textContent.toLowerCase().includes(search)?'block':'none';
-    });
-});
-
+async function deleteAnnouncement(id){if(!profile?.is_admin)return alert('ACCESS DENIED');if(!confirm('Delete this contract?'))return;const {error}=await db.from('announcements').delete().eq('id',id);if(error)return alert('DELETE ERROR:\n\n'+error.message);await loadAnnouncements()}
+async function logout(){await db.auth.signOut();window.location.replace('index.html')}
+function escapeHtml(value){const d=document.createElement('div');d.textContent=value??'';return d.innerHTML}
+document.getElementById('searchBar').addEventListener('input',e=>{const s=e.target.value.toLowerCase().trim();document.querySelectorAll('.market-card').forEach(c=>c.style.display=c.textContent.toLowerCase().includes(s)?'block':'none')});
 startMarket();
-</script></body></html>
+</script>
+</body>
+</html>
