@@ -1,226 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hunter Info</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Hunter Info</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;width:100%;min-height:1400px;overflow-x:hidden;overflow-y:auto;position:relative}
-.bg{position:absolute;top:6px;right:0;width:65%;height:50%;object-fit:cover;z-index:0}
-.photo{position:absolute;left:10px;top:10px;width:185px;height:185px;overflow:hidden;z-index:5}.photo img{width:100%;height:100%;object-fit:cover}
-.head{position:absolute;left:500px;top:10px;width:140px;z-index:6}.bodytxt{position:absolute;right:250px;top:250px;width:150px;z-index:7}
-.licenceText{position:absolute;left:600px;top:310px;font-size:35px;color:#000;white-space:nowrap;z-index:8}
-.info{position:absolute;left:-4px;top:200px;width:540px;z-index:4}.info-content{position:absolute;top:10px;left:20px;font-size:28px;line-height:1.5;color:#000;z-index:20}
-.completed-box{position:absolute;left:20px;top:820px;width:520px;height:300px;overflow-y:auto;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}
-.completed-item{color:#fff;padding:8px 0;border-bottom:1px solid #333}
-.hunter-stats{position:absolute;right:30px;top:540px;width:420px;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}.hunter-stats h2{text-align:center;margin-bottom:15px}.hunter-stats p{color:#fff;margin-bottom:10px}
-.badges-box{position:absolute;right:30px;top:900px;width:420px;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}.badges-box h2{text-align:center;margin-bottom:15px}.badges-box p{color:#fff;margin-bottom:10px}
-.blood{position:absolute;bottom:-80px;left:0;width:430px;z-index:2}.killtxt{position:absolute;left:15px;bottom:1px;font-size:65px;color:#fff;z-index:10}.counter{position:absolute;left:340px;bottom:-5px;display:flex;z-index:9}.counter img{height:135px;margin-left:-10px}
-.back-btn{position:absolute;top:20px;right:800px;background:#ff0000;color:#000;border:none;padding:10px 20px;cursor:pointer;font-family:'Ax-Regular';z-index:50}.edit-btn{margin-top:15px;background:#ff0000;color:#000;border:none;padding:10px 15px;cursor:pointer;font-family:'Ax-Regular'}
-</style>
-</head>
+@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;width:100%;min-height:1500px;overflow-x:hidden;overflow-y:auto;position:relative}.bg{position:absolute;top:6px;right:0;width:65%;height:50%;object-fit:cover;z-index:0}.photo{position:absolute;left:10px;top:10px;width:185px;height:185px;overflow:hidden;z-index:5}.photo img{width:100%;height:100%;object-fit:cover}.head{position:absolute;left:500px;top:10px;width:140px;z-index:6}.bodytxt{position:absolute;right:250px;top:250px;width:150px;z-index:7}.licenceText{position:absolute;left:600px;top:310px;font-size:35px;color:#000;white-space:nowrap;z-index:8}.info{position:absolute;left:-4px;top:200px;width:540px;z-index:4}.info-content{position:absolute;top:10px;left:20px;font-size:28px;line-height:1.5;color:#000;z-index:20}.completed-box{position:absolute;left:20px;top:820px;width:520px;height:300px;overflow-y:auto;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}.completed-item{color:#fff;padding:8px 0;border-bottom:1px solid #333}.hunter-stats{position:absolute;right:30px;top:540px;width:420px;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}.hunter-stats h2{text-align:center;margin-bottom:15px}.hunter-stats p{color:#fff;margin-bottom:10px}.badges-box{position:absolute;right:30px;top:900px;width:420px;background:rgba(0,0,0,.9);border:2px solid #ff0000;padding:20px;z-index:30}.badges-box h2{text-align:center;margin-bottom:15px}.badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.badge{text-align:center;color:#fff;min-height:110px}.badge img{width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 6px}.badge.locked{opacity:.25;filter:grayscale(1)}.badge span{font-size:12px}.blood{position:absolute;bottom:-80px;left:0;width:430px;z-index:2}.kill-panel{position:absolute;left:20px;top:1150px;width:520px;background:rgba(0,0,0,.9);border:2px solid #ff0000;padding:25px;z-index:30;text-align:center}.kill-panel h2{margin-bottom:15px}.kill-count{display:flex;justify-content:center;align-items:center;gap:3px;min-height:140px}.kill-count img{height:120px;width:auto;object-fit:contain}.kill-fallback{font-size:80px;color:#fff}.kill-subtitle{color:#aaa;margin-top:10px}.counter{display:none}.back-btn{position:absolute;top:20px;right:800px;background:#ff0000;color:#000;border:none;padding:10px 20px;cursor:pointer;font-family:'Ax-Regular';z-index:50}.edit-btn{margin-top:15px;background:#ff0000;color:#000;border:none;padding:10px 15px;cursor:pointer;font-family:'Ax-Regular'}
+</style></head>
 <body>
-<img class="bg" src="Alt7.png" alt="Background">
-<div class="photo"><img src="pfp.jpg" alt="Hunter photo"></div>
-<img class="head" src="Head.png" alt="Head">
-<img class="bodytxt" src="Body.png" alt="Body">
-<div class="licenceText">Alien X.terminator licence</div>
+<img class="bg" src="Alt7.png" alt="Background"><div class="photo"><img src="pfp.jpg" alt="Hunter photo"></div><img class="head" src="Head.png" alt="Head"><img class="bodytxt" src="Body.png" alt="Body"><div class="licenceText">Alien X.terminator licence</div>
 <div class="info"><img src="txtbox.png" alt="Info box"><div class="info-content">Loading profile...</div></div>
 <div class="completed-box"><h2>COMPLETED CONTRACTS</h2><div id="completed-list"></div></div>
 <div class="hunter-stats"><h2>HUNTER STATS</h2><div id="hunter-stats-content"></div></div>
-<div class="badges-box"><h2>BADGES</h2><div id="badges-content"></div></div>
-<img class="blood" src="blood.png" alt="Blood">
-<div class="killtxt">Kill count :</div>
-<div class="counter" id="counter"></div>
-<button class="back-btn" onclick="window.location.replace('Market.html')">← MARKET</button>
+<div class="badges-box"><h2>BADGES</h2><div id="badges-content" class="badges-grid"></div></div>
+<div class="kill-panel"><h2>KILL COUNT</h2><div id="kill-count" class="kill-count"></div><div id="kill-subtitle" class="kill-subtitle">Validated kills only</div></div>
+<img class="blood" src="blood.png" alt="Blood"><button class="back-btn" onclick="window.location.replace('Market.html')">← MARKET</button>
 <script>
-const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
-const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let user=null;
-let profile=null;
-let history=[];
-
-async function start(){
-    const {data,error}=await db.auth.getSession();
-    if(error||!data.session){window.location.replace('index.html');return}
-
-    user=data.session.user;
-
-    const {data:profileData,error:profileError}=await db
-        .from('Profiles')
-        .select('id,username,created_at,is_admin,first_name,surname,birth_date,hunter_name,hunter_number,kills')
-        .eq('id',user.id)
-        .single();
-
-    if(profileError||!profileData){
-        console.error(profileError);
-        await db.auth.signOut();
-        window.location.replace('index.html');
-        return;
-    }
-
-    profile=profileData;
-    await loadData();
-}
-
-async function loadData(){
-    const {data:historyData,error:historyError}=await db
-        .from('contract_history')
-        .select('id,announcement_id,title,description,reward,image_url,status,reason,created_at')
-        .eq('hunter_id',user.id)
-        .order('created_at',{ascending:false});
-
-    if(historyError){
-        console.error('HISTORY ERROR:',historyError);
-        history=[];
-    }else{
-        history=historyData||[];
-    }
-
-    updateProfile();
-    renderStats();
-    renderCompleted();
-    renderBadges();
-    renderKills();
-}
-
-function displayValue(value){
-    return value===null||value===undefined||String(value).trim()===''?'Unknown':String(value);
-}
-
-function updateProfile(){
-    document.querySelector('.info-content').innerHTML=
-        `Name ${escapeHtml(displayValue(profile.first_name))}<br>`+
-        `Surname ${escapeHtml(displayValue(profile.surname))}<br>`+
-        `Birth date ${escapeHtml(displayValue(profile.birth_date))}<br>`+
-        `Hunter name ${escapeHtml(displayValue(profile.hunter_name))}<br>`+
-        `Hunter number ${escapeHtml(displayValue(profile.hunter_number))}<br>`+
-        `<button class="edit-btn" onclick="editProfile()">EDIT PROFILE</button>`;
-}
-
-async function editProfile(){
-    const firstName=prompt('First Name',displayValue(profile.first_name));
-    if(firstName===null)return;
-    const surname=prompt('Surname',displayValue(profile.surname));
-    if(surname===null)return;
-    const birthDate=prompt('Birth Date',displayValue(profile.birth_date));
-    if(birthDate===null)return;
-    const hunterName=prompt('Hunter Name',displayValue(profile.hunter_name));
-    if(hunterName===null)return;
-
-    const {error}=await db.rpc('update_hunter_profile',{
-        p_first_name:firstName,
-        p_surname:surname,
-        p_birth_date:birthDate,
-        p_hunter_name:hunterName,
-        p_hunter_number:profile.hunter_number
-    });
-
-    if(error){
-        console.error(error);
-        return alert('PROFILE UPDATE ERROR:\n\n'+error.message);
-    }
-
-    const {data:profileData,error:profileError}=await db
-        .from('Profiles')
-        .select('id,username,created_at,is_admin,first_name,surname,birth_date,hunter_name,hunter_number,kills')
-        .eq('id',user.id)
-        .single();
-
-    if(profileError||!profileData){
-        console.error(profileError);
-        return alert('PROFILE REFRESH ERROR.');
-    }
-
-    profile=profileData;
-    updateProfile();
-}
-
-function renderStats(){
-    const completed=history.filter(item=>item.status==='completed').length;
-    const abandoned=history.filter(item=>item.status==='abandoned').length;
-    const xp=completed*100;
-    const level=Math.floor(xp/500)+1;
-    let rank='E';
-
-    if(completed>=100)rank='SSS';
-    else if(completed>=75)rank='SS';
-    else if(completed>=50)rank='S';
-    else if(completed>=25)rank='A';
-    else if(completed>=10)rank='B';
-
-    const total=completed+abandoned;
-    const successRate=total===0?100:Math.round((completed/total)*100);
-    const kills=Number(profile.kills)||0;
-
-    document.getElementById('hunter-stats-content').innerHTML=
-        `<p>Rank : ${rank}</p>`+
-        `<p>Level : ${level}</p>`+
-        `<p>XP : ${xp}</p>`+
-        `<p>Completed Contracts : ${completed}</p>`+
-        `<p>Abandoned Contracts : ${abandoned}</p>`+
-        `<p>Success Rate : ${successRate}%</p>`+
-        `<p>Kill Count : ${kills}</p>`;
-}
-
-function renderCompleted(){
-    const list=document.getElementById('completed-list');
-    list.innerHTML='';
-
-    const completed=history.filter(item=>item.status==='completed');
-    if(!completed.length){
-        list.innerHTML='<div class="completed-item">No completed contracts</div>';
-        return;
-    }
-
-    completed.forEach(contract=>{
-        const item=document.createElement('div');
-        item.className='completed-item';
-        item.textContent='✓ '+(contract.title||'Untitled contract');
-        list.appendChild(item);
-    });
-}
-
-function renderBadges(){
-    const box=document.getElementById('badges-content');
-    const completed=history.filter(item=>item.status==='completed').length;
-    const kills=Number(profile.kills)||0;
-    const badges=[];
-
-    if(completed>=1)badges.push('🎯 First Contract');
-    if(completed>=10)badges.push('🏆 Veteran Hunter');
-    if(completed>=25)badges.push('⚔ Elite Hunter');
-    if(completed>=50)badges.push('👽 Alien Exterminator');
-    if(kills>=100)badges.push('💀 100 Kills Club');
-    if(kills>=500)badges.push('☠ Reaper');
-
-    box.innerHTML=badges.length?badges.map(b=>`<p>${escapeHtml(b)}</p>`).join(''):'<p>No badges unlocked</p>';
-}
-
-function renderKills(){
-    const kills=Math.max(0,Number(profile.kills)||0);
-    const counter=document.getElementById('counter');
-    counter.innerHTML='';
-
-    for(const digit of String(kills)){
-        const img=document.createElement('img');
-        img.src=digit+'.png';
-        img.alt=digit;
-        counter.appendChild(img);
-    }
-}
-
-function escapeHtml(value){
-    const div=document.createElement('div');
-    div.textContent=value??'';
-    return div.innerHTML;
-}
-
-start();
-</script>
-</body>
-</html>
+const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let user=null,profile=null,history=[];
+async function start(){const {data,error}=await db.auth.getSession();if(error||!data.session){window.location.replace('index.html');return}user=data.session.user;const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,created_at,is_admin,first_name,surname,birth_date,hunter_name,hunter_number,kills').eq('id',user.id).single();if(profileError||!profileData){console.error(profileError);await db.auth.signOut();window.location.replace('index.html');return}profile=profileData;await loadData()}
+async function loadData(){const {data,error}=await db.from('contract_history').select('id,announcement_id,title,description,reward,image_url,status,reason,verification_note,kills_awarded,created_at').eq('hunter_id',user.id).order('created_at',{ascending:false});if(error){console.error(error);history=[]}else history=data||[];updateProfile();renderStats();renderCompleted();renderBadges();renderKills()}
+function displayValue(v){return v===null||v===undefined||String(v).trim()===''?'Unknown':String(v)}
+function updateProfile(){document.querySelector('.info-content').innerHTML=`Name ${escapeHtml(displayValue(profile.first_name))}<br>Surname ${escapeHtml(displayValue(profile.surname))}<br>Birth date ${escapeHtml(displayValue(profile.birth_date))}<br>Hunter name ${escapeHtml(displayValue(profile.hunter_name))}<br>Hunter number ${escapeHtml(displayValue(profile.hunter_number))}<br><button class="edit-btn" onclick="editProfile()">EDIT PROFILE</button>`}
+async function editProfile(){const firstName=prompt('First Name',displayValue(profile.first_name));if(firstName===null)return;const surname=prompt('Surname',displayValue(profile.surname));if(surname===null)return;const birthDate=prompt('Birth Date',displayValue(profile.birth_date));if(birthDate===null)return;const hunterName=prompt('Hunter Name',displayValue(profile.hunter_name));if(hunterName===null)return;const {error}=await db.rpc('update_hunter_profile',{p_first_name:firstName,p_surname:surname,p_birth_date:birthDate,p_hunter_name:hunterName,p_hunter_number:profile.hunter_number});if(error){console.error(error);return alert('PROFILE UPDATE ERROR:\n\n'+error.message)}const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,created_at,is_admin,first_name,surname,birth_date,hunter_name,hunter_number,kills').eq('id',user.id).single();if(profileError||!profileData)return alert('PROFILE REFRESH ERROR.');profile=profileData;updateProfile()}
+function renderStats(){const completed=history.filter(x=>x.status==='completed').length;const abandoned=history.filter(x=>x.status==='abandoned').length;const xp=completed*100;const level=Math.floor(xp/500)+1;let rank='E';if(completed>=100)rank='SSS';else if(completed>=75)rank='SS';else if(completed>=50)rank='S';else if(completed>=25)rank='A';else if(completed>=10)rank='B';const total=completed+abandoned;const successRate=total===0?100:Math.round(completed/total*100);const kills=Number(profile.kills)||0;document.getElementById('hunter-stats-content').innerHTML=`<p>Rank : ${rank}</p><p>Level : ${level}</p><p>XP : ${xp}</p><p>Completed Contracts : ${completed}</p><p>Abandoned Contracts : ${abandoned}</p><p>Success Rate : ${successRate}%</p><p>Validated Kills : ${kills}</p>`}
+function renderCompleted(){const list=document.getElementById('completed-list');list.innerHTML='';const completed=history.filter(x=>x.status==='completed');if(!completed.length){list.innerHTML='<div class="completed-item">No completed contracts</div>';return}completed.forEach(c=>{const item=document.createElement('div');item.className='completed-item';item.textContent='✓ '+(c.title||'Untitled contract')+'  ['+(Number(c.kills_awarded)||0)+' KILLS]';list.appendChild(item)})}
+function badgeDefinitions(){return[
+ {name:'FIRST CONTRACT',file:'badges/first_contract.png',unlocked:history.filter(x=>x.status==='completed').length>=1},
+ {name:'VETERAN HUNTER',file:'badges/veteran.png',unlocked:history.filter(x=>x.status==='completed').length>=10},
+ {name:'ELITE HUNTER',file:'badges/elite.png',unlocked:history.filter(x=>x.status==='completed').length>=25},
+ {name:'ALIEN EXTERMINATOR',file:'badges/exterminator.png',unlocked:history.filter(x=>x.status==='completed').length>=50},
+ {name:'100 KILLS',file:'badges/100_kills.png',unlocked:(Number(profile.kills)||0)>=100},
+ {name:'REAPER',file:'badges/reaper.png',unlocked:(Number(profile.kills)||0)>=500}
+]}
+function renderBadges(){const box=document.getElementById('badges-content');box.innerHTML='';badgeDefinitions().forEach(b=>{const item=document.createElement('div');item.className='badge'+(b.unlocked?'':' locked');const img=document.createElement('img');img.src=b.file;img.alt=b.name;img.onerror=()=>{img.style.visibility='hidden'};const label=document.createElement('span');label.textContent=b.name;item.append(img,label);box.appendChild(item)})}
+function renderKills(){const count=Math.max(0,Number(profile.kills)||0);const box=document.getElementById('kill-count');box.innerHTML='';const digits=String(count);let loaded=0;digits.split('').forEach(d=>{const img=document.createElement('img');img.src=d+'.png';img.alt=d;img.onload=()=>{loaded++;};img.onerror=()=>{img.remove();const fallback=document.createElement('span');fallback.className='kill-fallback';fallback.textContent=count;box.innerHTML='';box.appendChild(fallback)};box.appendChild(img)});document.getElementById('kill-subtitle').textContent=count===1?'1 validated kill':'Validated kills only — '+count+' total'}
+function escapeHtml(v){const d=document.createElement('div');d.textContent=v??'';return d.innerHTML}start();
+</script></body></html>
