@@ -1,127 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A.X MARKET</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;min-height:100vh;overflow-y:auto}
-.top-bar{height:75px;background:#0a0a0a;border-bottom:3px solid #ff0000;display:flex;align-items:center;padding:0 20px;gap:20px}
-.left-icons{display:flex;gap:18px}.left-icons img{cursor:pointer;transition:.2s}.left-icons img:hover{transform:scale(1.15)}
-.search-bar{flex:1;height:48px;background:#111;border:2px solid #ff0000;color:#ff0000;padding:0 20px;font-size:1.3rem;font-family:'Ax-Regular';outline:none}
-.profile{display:flex;align-items:center;gap:12px}.profile-img{width:48px;height:48px;border:2px solid #ff0000;object-fit:cover}.logout-btn{background:#ff0000;color:#000;border:none;padding:8px 14px;cursor:pointer;font-family:'Ax-Regular'}
-.main-container{display:flex;min-height:calc(100vh - 75px)}.left-panel{width:300px;background:#000;padding:2px}.left-panel img{max-width:105%;max-height:105%;object-fit:contain}
-.market-grid{flex:1;padding:30px;padding-bottom:180px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px}
-.market-card{position:relative;background:#fff;color:#000;padding:20px;min-height:340px}.card-img{width:100%;height:180px;object-fit:cover;background:#ddd;margin-bottom:15px}
-.admin-btn{position:fixed;bottom:20px;right:20px;background:#ff0000;color:#000;padding:15px 25px;font-size:1.4rem;border:none;cursor:pointer;font-family:'Ax-Regular';z-index:9999;display:none}
-.edit-btn{position:absolute;top:10px;right:10px;background:#ff0000;color:#000;border:none;padding:7px 12px;cursor:pointer;font-family:'Ax-Regular';font-size:13px;z-index:5}.edit-btn:hover{background:#000;color:#ff0000;border:1px solid #ff0000}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;justify-content:center;align-items:center}.modal-content{width:520px;max-width:90%;border:3px solid #ff0000;background:#000;padding:30px}.modal-content h2{text-align:center;margin-bottom:20px}.modal-content input,.modal-content textarea{width:100%;margin-bottom:15px;padding:12px;background:#111;border:1px solid #ff0000;color:#fff;font-family:'Ax-Regular'}.modal-content textarea{min-height:120px;resize:vertical}.modal-buttons{display:flex;gap:15px}.modal-buttons button{flex:1;padding:15px;cursor:pointer;font-family:'Ax-Regular'}.cancel-btn{background:transparent;color:#ff0000;border:2px solid #ff0000}.publish-btn{background:#ff0000;color:#000;border:none}
-.action-buttons{display:flex;gap:10px;margin-top:15px}.accept-btn,.delete-btn{flex:1;padding:8px;font-size:14px;cursor:pointer;font-family:'Ax-Regular'}.accept-btn{background:#111;color:#ff0000;border:2px solid #ff0000}.delete-btn{background:#ff0000;color:#000;border:none}.taken{color:red;font-weight:bold;margin-top:10px}.loading{font-size:1.5rem}
-</style>
-</head>
-<body>
-<div class="top-bar">
-<div class="left-icons">
-<img src="file.png" width="40" height="35" onclick="window.location.href='filepage.html'">
-<img src="hunterid.png" width="45" height="35" onclick="window.location.href='hunterinfo.html'">
-<img src="Iconecontrat.png" width="45" height="40" onclick="window.location.href='Contrats.html'">
-</div>
-<input type="text" class="search-bar" placeholder="SEARCH..." id="searchBar">
-<div class="profile"><span id="current-user"></span><img src="pfp.jpg" class="profile-img"><button class="logout-btn" onclick="logout()">LOGOUT</button></div>
-</div>
-<div class="main-container"><div class="left-panel"><img src="logo2.png"></div><div class="market-grid" id="market-grid"><div class="loading">LOADING...</div></div></div>
-<button class="admin-btn" id="admin-btn" onclick="showPostModal()">+ PUBLISH CONTRACT</button>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>A.X MARKET</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;min-height:100vh;overflow-y:auto}.top-bar{height:75px;background:#0a0a0a;border-bottom:3px solid #ff0000;display:flex;align-items:center;padding:0 20px;gap:20px}.left-icons{display:flex;gap:18px}.left-icons img{cursor:pointer;transition:.2s}.left-icons img:hover{transform:scale(1.15)}.search-bar{flex:1;height:48px;background:#111;border:2px solid #ff0000;color:#ff0000;padding:0 20px;font-size:1.3rem;font-family:'Ax-Regular';outline:none}.profile{display:flex;align-items:center;gap:12px}.profile-img{width:48px;height:48px;border:2px solid #ff0000;object-fit:cover}.logout-btn{background:#ff0000;color:#000;border:none;padding:8px 14px;cursor:pointer;font-family:'Ax-Regular'}.main-container{display:flex;min-height:calc(100vh - 75px)}.left-panel{width:300px;background:#000;padding:2px}.left-panel img{max-width:105%;max-height:105%;object-fit:contain}.market-grid{flex:1;padding:30px;padding-bottom:180px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px}.market-card{position:relative;background:#fff;color:#000;padding:20px;min-height:340px}.card-img{width:100%;height:180px;object-fit:cover;background:#ddd;margin-bottom:15px}.admin-btn{position:fixed;bottom:20px;right:20px;background:#ff0000;color:#000;padding:15px 25px;font-size:1.4rem;border:none;cursor:pointer;font-family:'Ax-Regular';z-index:9999;display:none}.edit-btn{position:absolute;top:10px;right:10px;background:#ff0000;color:#000;border:none;padding:7px 12px;cursor:pointer;font-family:'Ax-Regular';font-size:13px;z-index:5}.edit-btn:hover{background:#000;color:#ff0000;border:1px solid #ff0000}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;justify-content:center;align-items:center}.modal-content{width:520px;max-width:90%;border:3px solid #ff0000;background:#000;padding:30px}.modal-content h2{text-align:center;margin-bottom:20px}.modal-content input,.modal-content textarea{width:100%;margin-bottom:15px;padding:12px;background:#111;border:1px solid #ff0000;color:#fff;font-family:'Ax-Regular'}.modal-content textarea{min-height:120px;resize:vertical}.modal-buttons{display:flex;gap:15px}.modal-buttons button{flex:1;padding:15px;cursor:pointer;font-family:'Ax-Regular'}.cancel-btn{background:transparent;color:#ff0000;border:2px solid #ff0000}.publish-btn{background:#ff0000;color:#000;border:none}.action-buttons{display:flex;gap:10px;margin-top:15px}.accept-btn,.delete-btn{flex:1;padding:8px;font-size:14px;cursor:pointer;font-family:'Ax-Regular'}.accept-btn{background:#111;color:#ff0000;border:2px solid #ff0000}.delete-btn{background:#ff0000;color:#000;border:none}.taken{color:red;font-weight:bold;margin-top:10px}.loading{font-size:1.5rem}
+</style></head><body>
+<div class="top-bar"><div class="left-icons"><img src="file.png" width="40" height="35" onclick="window.location.href='filepage.html'"><img src="hunterid.png" width="45" height="35" onclick="window.location.href='hunterinfo.html'"><img src="Iconecontrat.png" width="45" height="40" onclick="window.location.href='Contrats.html'"></div><input type="text" class="search-bar" placeholder="SEARCH..." id="searchBar"><div class="profile"><span id="current-user"></span><img src="pfp.jpg" class="profile-img"><button class="logout-btn" onclick="logout()">LOGOUT</button></div></div>
+<div class="main-container"><div class="left-panel"><img src="logo2.png"></div><div class="market-grid" id="market-grid"><div class="loading">LOADING...</div></div></div><button class="admin-btn" id="admin-btn" onclick="showPostModal()">+ PUBLISH CONTRACT</button>
 <div id="post-modal" class="modal"><div class="modal-content"><h2 id="modal-heading">NEW ANNOUNCEMENT</h2><input type="text" id="modal-title" placeholder="Title.."><textarea id="modal-desc" placeholder="Description.."></textarea><input type="text" id="modal-reward" placeholder="Reward.."><input type="file" id="modal-image" accept="image/*"><div class="modal-buttons"><button class="cancel-btn" onclick="closeModal()">CANCEL</button><button class="publish-btn" id="modal-submit-btn" onclick="publishPost()">PUBLISH</button></div></div></div>
 <script>
-const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzZHBwY2t4enp4d25yaWRyanpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNDA3NzksImV4cCI6MjEwMjcxNjc3OX0.O-JxoUMP9DFc2-GGRggAKdhrKsRYYK2uGPzJ9BwIFX8';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let user=null,profile=null,announcements=[],editingAnnouncementId=null;
-async function startMarket(){
- const {data,error}=await db.auth.getSession();
- if(error||!data.session){window.location.replace('index.html');return}
- user=data.session.user;
- const {data:profileData,error:profileError}=await db.from('profiles').select('id,username,created_at,is_admin').eq('id',user.id).single();
- if(profileError||!profileData){console.error('PROFILE ERROR:',profileError);await db.auth.signOut();window.location.replace('index.html');return}
- profile=profileData;
- localStorage.setItem('ax_user',profile.username);
- document.getElementById('current-user').textContent=profile.username;
- document.getElementById('admin-btn').style.display=profile.is_admin===true?'block':'none';
- await loadAnnouncements();
-}
-async function loadAnnouncements(){
- const {data,error}=await db.from('announcements').select('*').order('created_at',{ascending:false});
- if(error){console.error('ANNOUNCEMENT ERROR:',error);document.getElementById('market-grid').innerHTML='<p>ERROR LOADING MARKET</p>';return}
- announcements=data||[];renderAnnouncements();
-}
-function renderAnnouncements(){
- const grid=document.getElementById('market-grid');grid.innerHTML='';
- if(!announcements.length){grid.innerHTML='<p>NO CONTRACTS AVAILABLE</p>';return}
- announcements.forEach(announcement=>{
-  const card=document.createElement('div');card.className='market-card';
-  if(profile?.is_admin===true){const edit=document.createElement('button');edit.className='edit-btn';edit.textContent='EDIT';edit.onclick=()=>editAnnouncement(announcement.id);card.appendChild(edit)}
-  if(announcement.image_url){const img=document.createElement('img');img.src=announcement.image_url;img.className='card-img';card.appendChild(img)}else{const empty=document.createElement('div');empty.className='card-img';card.appendChild(empty)}
-  const title=document.createElement('h2');title.textContent=announcement.title;card.appendChild(title);
-  const desc=document.createElement('p');desc.style.margin='15px 0';desc.textContent=announcement.description||'';card.appendChild(desc);
-  const reward=document.createElement('p');reward.innerHTML='<strong>Reward :</strong> '+(announcement.reward||'Not specified');card.appendChild(reward);
-  if(announcement.taken){const taken=document.createElement('div');taken.className='taken';taken.textContent='Mission accepted by: '+(announcement.hunter_username||'Unknown');card.appendChild(taken)}else{
-   const actions=document.createElement('div');actions.className='action-buttons';const accept=document.createElement('button');accept.className='accept-btn';accept.textContent='ACCEPT';accept.onclick=()=>acceptMission(announcement.id);actions.appendChild(accept);
-   if(profile?.is_admin===true){const del=document.createElement('button');del.className='delete-btn';del.textContent='DELETE';del.onclick=()=>deleteAnnouncement(announcement.id);actions.appendChild(del)}
-   card.appendChild(actions);
-  }
-  grid.appendChild(card);
- });
-}
-function showPostModal(){
- if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
- editingAnnouncementId=null;document.getElementById('modal-heading').textContent='NEW ANNOUNCEMENT';document.getElementById('modal-submit-btn').textContent='PUBLISH';document.getElementById('modal-title').value='';document.getElementById('modal-desc').value='';document.getElementById('modal-reward').value='';document.getElementById('modal-image').value='';document.getElementById('post-modal').style.display='flex';
-}
-function editAnnouncement(id){
- if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
- const announcement=announcements.find(item=>item.id===id);if(!announcement)return alert('Announcement not found.');
- editingAnnouncementId=id;document.getElementById('modal-heading').textContent='EDIT ANNOUNCEMENT';document.getElementById('modal-submit-btn').textContent='SAVE CHANGES';document.getElementById('modal-title').value=announcement.title||'';document.getElementById('modal-desc').value=announcement.description||'';document.getElementById('modal-reward').value=announcement.reward||'';document.getElementById('modal-image').value='';document.getElementById('post-modal').style.display='flex';
-}
+const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzZHBwY2t4enp4d25yaWRyanpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNDA3NzksImV4cCI6MjEwMjcxNjc3OX0.O-JxoUMP9DFc2-GGRggAKdhrKsRYYK2uGPzJ9BwIFX8';const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let user=null,profile=null,announcements=[],editingAnnouncementId=null;
+async function startMarket(){const {data,error}=await db.auth.getSession();if(error||!data.session){window.location.replace('index.html');return}user=data.session.user;const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,created_at,is_admin').eq('id',user.id).single();if(profileError||!profileData){console.error('PROFILE ERROR:',profileError);await db.auth.signOut();window.location.replace('index.html');return}profile=profileData;localStorage.setItem('ax_user',profile.username);document.getElementById('current-user').textContent=profile.username;document.getElementById('admin-btn').style.display=profile.is_admin===true?'block':'none';await loadAnnouncements()}
+async function loadAnnouncements(){const {data,error}=await db.from('announcements').select('*').order('created_at',{ascending:false});if(error){console.error('ANNOUNCEMENT ERROR:',error);document.getElementById('market-grid').innerHTML='<p>ERROR LOADING MARKET</p>';return}announcements=data||[];renderAnnouncements()}
+function renderAnnouncements(){const grid=document.getElementById('market-grid');grid.innerHTML='';if(!announcements.length){grid.innerHTML='<p>NO CONTRACTS AVAILABLE</p>';return}announcements.forEach(announcement=>{const card=document.createElement('div');card.className='market-card';if(profile?.is_admin===true){const edit=document.createElement('button');edit.className='edit-btn';edit.textContent='EDIT';edit.onclick=()=>editAnnouncement(announcement.id);card.appendChild(edit)}if(announcement.image_url){const img=document.createElement('img');img.src=announcement.image_url;img.className='card-img';card.appendChild(img)}else{const empty=document.createElement('div');empty.className='card-img';card.appendChild(empty)}const title=document.createElement('h2');title.textContent=announcement.title;card.appendChild(title);const desc=document.createElement('p');desc.style.margin='15px 0';desc.textContent=announcement.description||'';card.appendChild(desc);const reward=document.createElement('p');reward.innerHTML='<strong>Reward :</strong> '+(announcement.reward||'Not specified');card.appendChild(reward);if(announcement.taken){const taken=document.createElement('div');taken.className='taken';taken.textContent='Mission accepted by: '+(announcement.hunter_username||'Unknown');card.appendChild(taken)}else{const actions=document.createElement('div');actions.className='action-buttons';const accept=document.createElement('button');accept.className='accept-btn';accept.textContent='ACCEPT';accept.onclick=()=>acceptMission(announcement.id);actions.appendChild(accept);if(profile?.is_admin===true){const del=document.createElement('button');del.className='delete-btn';del.textContent='DELETE';del.onclick=()=>deleteAnnouncement(announcement.id);actions.appendChild(del)}card.appendChild(actions)}grid.appendChild(card)})}
+function showPostModal(){if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');editingAnnouncementId=null;document.getElementById('modal-heading').textContent='NEW ANNOUNCEMENT';document.getElementById('modal-submit-btn').textContent='PUBLISH';document.getElementById('modal-title').value='';document.getElementById('modal-desc').value='';document.getElementById('modal-reward').value='';document.getElementById('modal-image').value='';document.getElementById('post-modal').style.display='flex'}
+function editAnnouncement(id){if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');const announcement=announcements.find(item=>item.id===id);if(!announcement)return alert('Announcement not found.');editingAnnouncementId=id;document.getElementById('modal-heading').textContent='EDIT ANNOUNCEMENT';document.getElementById('modal-submit-btn').textContent='SAVE CHANGES';document.getElementById('modal-title').value=announcement.title||'';document.getElementById('modal-desc').value=announcement.description||'';document.getElementById('modal-reward').value=announcement.reward||'';document.getElementById('modal-image').value='';document.getElementById('post-modal').style.display='flex'}
 function closeModal(){document.getElementById('post-modal').style.display='none';editingAnnouncementId=null}
-async function publishPost(){
- if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
- const title=document.getElementById('modal-title').value.trim(),description=document.getElementById('modal-desc').value.trim(),reward=document.getElementById('modal-reward').value.trim(),file=document.getElementById('modal-image').files[0];
- if(!title)return alert('Title required.');
- if(editingAnnouncementId){
-  const updateData={title,description,reward};
-  if(file){try{updateData.image_url=await fileToDataURL(file)}catch(e){console.error(e);return alert('Could not read image.')}}
-  const {error}=await db.from('announcements').update(updateData).eq('id',editingAnnouncementId);
-  if(error){console.error(error);return alert('EDIT ERROR:\n\n'+error.message)}
-  closeModal();await loadAnnouncements();return alert('ANNOUNCEMENT UPDATED.');
- }
- let image_url=null;if(file){try{image_url=await fileToDataURL(file)}catch(e){console.error(e);return alert('Could not read image.')}}
- const {error}=await db.from('announcements').insert({title,description,reward,image_url,taken:false,hunter_id:null,hunter_username:null,created_by:user.id});
- if(error){console.error(error);return alert('PUBLISH ERROR:\n\n'+error.message)}
- closeModal();await loadAnnouncements();alert('CONTRACT PUBLISHED.');
-}
+async function publishPost(){if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');const title=document.getElementById('modal-title').value.trim(),description=document.getElementById('modal-desc').value.trim(),reward=document.getElementById('modal-reward').value.trim(),file=document.getElementById('modal-image').files[0];if(!title)return alert('Title required.');if(editingAnnouncementId){const updateData={title,description,reward};if(file){try{updateData.image_url=await fileToDataURL(file)}catch(e){console.error(e);return alert('Could not read image.')}}const {error}=await db.from('announcements').update(updateData).eq('id',editingAnnouncementId);if(error){console.error(error);return alert('EDIT ERROR:\n\n'+error.message)}closeModal();await loadAnnouncements();return alert('ANNOUNCEMENT UPDATED.')}let image_url=null;if(file){try{image_url=await fileToDataURL(file)}catch(e){console.error(e);return alert('Could not read image.')}}const {error}=await db.from('announcements').insert({title,description,reward,image_url,taken:false,hunter_id:null,hunter_username:null,created_by:user.id});if(error){console.error(error);return alert('PUBLISH ERROR:\n\n'+error.message)}closeModal();await loadAnnouncements();alert('CONTRACT PUBLISHED.')}
 function fileToDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(file)})}
-async function acceptMission(id){
- if(!user)return alert('You must be logged in.');
- const announcement=announcements.find(item=>item.id===id);if(!announcement)return alert('Announcement not found.');
- if(announcement.taken)return alert('Mission already taken.');
- if(!confirm('Accept this contract?'))return;
- const {data,error}=await db.rpc('accept_contract',{p_announcement_id:id});
- if(error){console.error(error);return alert('ACCEPT ERROR:\n\n'+error.message)}
- console.log('Contract created:',data);await loadAnnouncements();alert('MISSION ACCEPTED.');
-}
-async function deleteAnnouncement(id){
- if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');
- if(!confirm('Delete this announcement?'))return;
- const {error}=await db.from('announcements').delete().eq('id',id);
- if(error){console.error(error);return alert('DELETE ERROR:\n\n'+error.message)}
- await loadAnnouncements();
-}
+async function acceptMission(id){if(!user)return alert('You must be logged in.');const announcement=announcements.find(item=>item.id===id);if(!announcement)return alert('Announcement not found.');if(announcement.taken)return alert('Mission already taken.');if(!confirm('Accept this contract?'))return;const {data,error}=await db.rpc('accept_contract',{p_announcement_id:id});if(error){console.error(error);return alert('ACCEPT ERROR:\n\n'+error.message)}console.log('Contract created:',data);await loadAnnouncements();alert('MISSION ACCEPTED.')}
+async function deleteAnnouncement(id){if(!profile||profile.is_admin!==true)return alert('ACCESS DENIED');if(!confirm('Delete this announcement?'))return;const {error}=await db.from('announcements').delete().eq('id',id);if(error){console.error(error);return alert('DELETE ERROR:\n\n'+error.message)}await loadAnnouncements()}
 async function logout(){try{const {error}=await db.auth.signOut();if(error)console.error('LOGOUT ERROR:',error)}catch(e){console.error('LOGOUT ERROR:',e)}localStorage.removeItem('ax_user');sessionStorage.clear();window.location.replace('index.html')}
-document.getElementById('searchBar').addEventListener('input',event=>{const search=event.target.value.toLowerCase().trim();document.querySelectorAll('.market-card').forEach(card=>{card.style.display=card.textContent.toLowerCase().includes(search)?'block':'none'})});
-startMarket();
-</script>
-</body>
-</html>
+document.getElementById('searchBar').addEventListener('input',event=>{const search=event.target.value.toLowerCase().trim();document.querySelectorAll('.market-card').forEach(card=>{card.style.display=card.textContent.toLowerCase().includes(search)?'block':'none'})});startMarket();
+</script></body></html>
