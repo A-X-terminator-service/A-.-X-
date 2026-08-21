@@ -44,22 +44,58 @@ let announcements=[];
 async function start(){
     const {data,error}=await db.auth.getSession();
     if(error||!data.session){window.location.replace('index.html');return}
+
     user=data.session.user;
-    const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,is_admin').eq('id',user.id).single();
-    if(profileError||!profileData){await db.auth.signOut();window.location.replace('index.html');return}
+
+    const {data:profileData,error:profileError}=await db
+        .from('Profiles')
+        .select('id,username,is_admin')
+        .eq('id',user.id)
+        .single();
+
+    if(profileError||!profileData){
+        await db.auth.signOut();
+        window.location.replace('index.html');
+        return;
+    }
+
     profile=profileData;
-    localStorage.setItem('ax_user',profile.username);
     await loadContracts();
 }
 
 async function loadContracts(){
-    const {data:contractData,error:contractError}=await db.from('contracts').select('id,announcement_id,hunter_id,created_at').eq('hunter_id',user.id).order('created_at',{ascending:false});
-    if(contractError){console.error(contractError);document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACTS</div>';return}
+    const {data:contractData,error:contractError}=await db
+        .from('contracts')
+        .select('id,announcement_id,hunter_id,created_at')
+        .eq('hunter_id',user.id)
+        .order('created_at',{ascending:false});
+
+    if(contractError){
+        console.error(contractError);
+        document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACTS</div>';
+        return;
+    }
+
     contracts=contractData||[];
     const ids=contracts.map(c=>c.announcement_id).filter(Boolean);
-    if(!ids.length){announcements=[];renderContracts();return}
-    const {data:announcementData,error:announcementError}=await db.from('announcements').select('*').in('id',ids);
-    if(announcementError){console.error(announcementError);document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACT DETAILS</div>';return}
+
+    if(!ids.length){
+        announcements=[];
+        renderContracts();
+        return;
+    }
+
+    const {data:announcementData,error:announcementError}=await db
+        .from('announcements')
+        .select('*')
+        .in('id',ids);
+
+    if(announcementError){
+        console.error(announcementError);
+        document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACT DETAILS</div>';
+        return;
+    }
+
     announcements=announcementData||[];
     renderContracts();
 }
@@ -67,50 +103,104 @@ async function loadContracts(){
 function renderContracts(){
     const container=document.getElementById('contracts-container');
     container.innerHTML='';
-    if(!contracts.length){container.innerHTML='<div class="empty-text">NO ACTIVE CONTRACTS</div>';return}
+
+    if(!contracts.length){
+        container.innerHTML='<div class="empty-text">NO ACTIVE CONTRACTS</div>';
+        return;
+    }
+
     contracts.forEach(contract=>{
         const ann=announcements.find(a=>a.id===contract.announcement_id);
         if(!ann)return;
-        const card=document.createElement('div');card.className='market-card';
-        if(ann.image_url){const img=document.createElement('img');img.src=ann.image_url;img.className='card-img';card.appendChild(img)}else{const empty=document.createElement('div');empty.className='card-img';card.appendChild(empty)}
-        const title=document.createElement('h2');title.textContent=ann.title||'Untitled contract';card.appendChild(title);
-        const desc=document.createElement('p');desc.style.margin='15px 0';desc.textContent=ann.description||'';card.appendChild(desc);
-        const reward=document.createElement('p');reward.innerHTML='<strong>Reward :</strong> '+escapeHtml(ann.reward||'Not specified');card.appendChild(reward);
-        const select=document.createElement('select');select.className='reason-select';select.id='reason-'+contract.id;
-        ['Mission too difficult','Reward too low','Lack of time','Personal reasons','Selection mistake','Health issues','I accidentally fucked the alien'].forEach(reason=>{const option=document.createElement('option');option.textContent=reason;select.appendChild(option)});
+
+        const card=document.createElement('div');
+        card.className='market-card';
+
+        if(ann.image_url){
+            const img=document.createElement('img');
+            img.src=ann.image_url;
+            img.className='card-img';
+            img.alt=ann.title||'Contract';
+            card.appendChild(img);
+        }else{
+            const empty=document.createElement('div');
+            empty.className='card-img';
+            card.appendChild(empty);
+        }
+
+        const title=document.createElement('h2');
+        title.textContent=ann.title||'Untitled contract';
+        card.appendChild(title);
+
+        const desc=document.createElement('p');
+        desc.style.margin='15px 0';
+        desc.textContent=ann.description||'';
+        card.appendChild(desc);
+
+        const reward=document.createElement('p');
+        reward.textContent='Reward : '+(ann.reward||'Not specified');
+        card.appendChild(reward);
+
+        const select=document.createElement('select');
+        select.className='reason-select';
+        select.id='reason-'+contract.id;
+
+        ['Mission too difficult','Reward too low','Lack of time','Personal reasons','Selection mistake','Health issues','I accidentally fucked the alien'].forEach(reason=>{
+            const option=document.createElement('option');
+            option.textContent=reason;
+            option.value=reason;
+            select.appendChild(option);
+        });
+
         card.appendChild(select);
-        const abandon=document.createElement('button');abandon.className='abandon-btn';abandon.textContent='ABANDON';abandon.onclick=()=>abandonContract(contract.id,ann.id);card.appendChild(abandon);
-        const complete=document.createElement('button');complete.className='complete-btn';complete.textContent='CONTRACT COMPLETED';complete.onclick=()=>completeContract(contract.id,ann.id);card.appendChild(complete);
+
+        const abandon=document.createElement('button');
+        abandon.className='abandon-btn';
+        abandon.textContent='ABANDON';
+        abandon.onclick=()=>abandonContract(contract.id);
+        card.appendChild(abandon);
+
+        const complete=document.createElement('button');
+        complete.className='complete-btn';
+        complete.textContent='CONTRACT COMPLETED';
+        complete.onclick=()=>completeContract(contract.id);
+        card.appendChild(complete);
+
         container.appendChild(card);
     });
 }
 
-function escapeHtml(value){const div=document.createElement('div');div.textContent=value;return div.innerHTML}
-
-async function abandonContract(contractId,announcementId){
+async function abandonContract(contractId){
     const reason=document.getElementById('reason-'+contractId)?.value||'Not specified';
     if(!confirm('Abandon this contract?\n\nReason: '+reason))return;
-    const {error:updateError}=await db.from('announcements').update({taken:false,hunter_id:null,hunter_username:null}).eq('id',announcementId);
-    if(updateError){console.error(updateError);alert('ABANDON ERROR:\n\n'+updateError.message);return}
-    const {error:deleteError}=await db.from('contracts').delete().eq('id',contractId).eq('hunter_id',user.id);
-    if(deleteError){console.error(deleteError);alert('CONTRACT CLEANUP ERROR:\n\n'+deleteError.message);return}
-    const abandoned=JSON.parse(localStorage.getItem('ax_abandoned_contracts')||'[]');
-    const ann=announcements.find(a=>a.id===announcementId);
-    abandoned.push({title:ann?.title||'Unknown',hunter:user.id,hunterUsername:profile.username,reason,date:new Date().toISOString()});
-    localStorage.setItem('ax_abandoned_contracts',JSON.stringify(abandoned));
+
+    const {error}=await db.rpc('abandon_contract',{
+        p_contract_id:contractId,
+        p_reason:reason
+    });
+
+    if(error){
+        console.error(error);
+        alert('ABANDON ERROR:\n\n'+error.message);
+        return;
+    }
+
     await loadContracts();
 }
 
-async function completeContract(contractId,announcementId){
+async function completeContract(contractId){
     if(!confirm('Mark this contract as completed?'))return;
-    const ann=announcements.find(a=>a.id===announcementId);
-    const {error}=await db.from('contracts').delete().eq('id',contractId).eq('hunter_id',user.id);
-    if(error){console.error(error);alert('COMPLETE ERROR:\n\n'+error.message);return}
-    const completed=JSON.parse(localStorage.getItem('ax_completed_contracts')||'[]');
-    completed.push({...ann,completedBy:user.id,completedUsername:profile.username,completedDate:new Date().toISOString()});
-    localStorage.setItem('ax_completed_contracts',JSON.stringify(completed));
-    const {error:updateError}=await db.from('announcements').update({taken:false,hunter_id:null,hunter_username:null}).eq('id',announcementId);
-    if(updateError)console.error('ANNOUNCEMENT RESET ERROR:',updateError);
+
+    const {error}=await db.rpc('complete_contract',{
+        p_contract_id:contractId
+    });
+
+    if(error){
+        console.error(error);
+        alert('COMPLETE ERROR:\n\n'+error.message);
+        return;
+    }
+
     await loadContracts();
 }
 
