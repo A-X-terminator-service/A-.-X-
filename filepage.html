@@ -4,129 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>user files</title>
-
 <style>
-@font-face{
-    font-family:'Ax-Regular';
-    src:url('Ax-Regular.ttf.otf') format('opentype');
-}
-.back-btn{
-    position:fixed;
-    bottom:20px;
-    left:20px;
-
-    background:#ff0000;
-    color:#000;
-    border:none;
-
-    padding:12px 20px;
-
-    font-family:'Ax-Regular';
-    font-size:1rem;
-
-    cursor:pointer;
-
-    z-index:1000;
-}
-
-.back-btn:hover{
-    transform:scale(1.05);
-}
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    background:black;
-    font-family:'Ax-Regular', sans-serif;
-    height:100vh;
-
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-
-    padding-top:80px;
-}
-
-/* ligne de dossiers */
-.images{
-    display:flex;
-    gap:100px;
-}
-
-/* bloc dossier */
-.folder{
-    text-align:center;
-}
-
-/* lien complet cliquable */
-.folder a{
-    text-decoration:none;
-    color:red;
-    display:block;
-}
-
-/* image */
-.folder img{
-    width:120px;
-    display:block;
-}
-
-/* texte */
-.folder p{
-    margin-top:10px;
-    font-size:25px;
-}
-
-/* petit effet au toucher */
-.folder:hover{
-    transform:scale(1.05);
-    transition:0.3s;
-}
+@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:red;font-family:'Ax-Regular',sans-serif;min-height:100vh;padding-top:80px;overflow-x:hidden}
+.images{display:flex;gap:70px;justify-content:center;flex-wrap:wrap;padding:20px}
+.folder{text-align:center;transition:.3s}
+.folder a{text-decoration:none;color:red;display:block}
+.folder img{width:120px;display:block;margin:auto}
+.folder p{margin-top:10px;font-size:25px}
+.folder:hover{transform:scale(1.05)}
+.back-btn{position:fixed;bottom:20px;left:20px;background:#ff0000;color:#000;border:none;padding:12px 20px;font-family:'Ax-Regular';font-size:1rem;cursor:pointer;z-index:1000}
+.back-btn:hover{transform:scale(1.05)}
+.unavailable{opacity:.35;cursor:not-allowed}
 </style>
 </head>
-
 <body>
-
 <div class="images">
-
-<div class="folder">
-<a href="guide1.pdf" download>
-<img src="file.png">
-<p>X.terminator<br>guide</p>
-</a>
+<div class="folder"><a href="Guide2.zip" download><img src="file.png" alt="File"><p>Alien ID<br>guide</p></a></div>
+<div class="folder"><a href="Nebu_Nexus_Level_7_Contacts.txt" download><img src="file.png" alt="File"><p>Darknet<br>contact</p></a></div>
+<div class="folder unavailable"><img src="file.png" alt="Unavailable file"><p>X.terminator<br>guide<br>[UNAVAILABLE]</p></div>
+<div class="folder unavailable"><img src="file.png" alt="Unavailable file"><p>User files<br>[UNAVAILABLE]</p></div>
 </div>
-
-<div class="folder">
-<a href="guide2.zip" download>
-<img src="file.png">
-<p>Alien id<br>guide</p>
-</a>
-</div>
-
-<div class="folder">
-<a href="Nebu_Nexus_Level_7_Contacts.txt" download>
-<img src="file.png">
-<p>Darknet<br>contact</p>
-</a>
-</div>
-
-<div class="folder">
-<a href="userfiles.rar" download>
-<img src="file.png">
-<p>user</p>
-</a>
-</div>
-
-</div>
-
+<button class="back-btn" onclick="window.location.replace('Market.html')">← MARKET</button>
 </body>
-<button
-    class="back-btn"
-    onclick="window.location.href='Market.html'"
->
-    ← MARKET
-</button>
 </html>
