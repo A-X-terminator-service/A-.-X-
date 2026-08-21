@@ -17,6 +17,7 @@ body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;width:100
 .completed-box{position:absolute;left:20px;top:820px;width:520px;height:300px;overflow-y:auto;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}
 .completed-item{color:#fff;padding:8px 0;border-bottom:1px solid #333}
 .hunter-stats{position:absolute;right:30px;top:540px;width:420px;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}.hunter-stats h2{text-align:center;margin-bottom:15px}.hunter-stats p{color:#fff;margin-bottom:10px}
+.badges-box{position:absolute;right:30px;top:900px;width:420px;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}.badges-box h2{text-align:center;margin-bottom:15px}.badges-box p{color:#fff;margin-bottom:10px}
 .blood{position:absolute;bottom:-80px;left:0;width:430px;z-index:2}.killtxt{position:absolute;left:15px;bottom:1px;font-size:65px;color:#fff;z-index:10}.counter{position:absolute;left:340px;bottom:-5px;display:flex;z-index:9}.counter img{height:135px;margin-left:-10px}
 .back-btn{position:absolute;top:20px;right:800px;background:#ff0000;color:#000;border:none;padding:10px 20px;cursor:pointer;font-family:'Ax-Regular';z-index:50}.edit-btn{margin-top:15px;background:#ff0000;color:#000;border:none;padding:10px 15px;cursor:pointer;font-family:'Ax-Regular'}
 </style>
@@ -30,6 +31,7 @@ body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;width:100
 <div class="info"><img src="txtbox.png" alt="Info box"><div class="info-content">Loading profile...</div></div>
 <div class="completed-box"><h2>COMPLETED CONTRACTS</h2><div id="completed-list"></div></div>
 <div class="hunter-stats"><h2>HUNTER STATS</h2><div id="hunter-stats-content"></div></div>
+<div class="badges-box"><h2>BADGES</h2><div id="badges-content"></div></div>
 <img class="blood" src="blood.png" alt="Blood">
 <div class="killtxt">Kill count :</div>
 <div class="counter" id="counter"></div>
@@ -38,87 +40,186 @@ body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;width:100
 const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
 const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let user=null,profile=null,hunterData=null;
+let user=null;
+let profile=null;
+let history=[];
 
 async function start(){
     const {data,error}=await db.auth.getSession();
     if(error||!data.session){window.location.replace('index.html');return}
+
     user=data.session.user;
-    const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,created_at,is_admin').eq('id',user.id).single();
-    if(profileError||!profileData){await db.auth.signOut();window.location.replace('index.html');return}
+
+    const {data:profileData,error:profileError}=await db
+        .from('Profiles')
+        .select('id,username,created_at,is_admin,first_name,surname,birth_date,hunter_name,hunter_number,kills')
+        .eq('id',user.id)
+        .single();
+
+    if(profileError||!profileData){
+        console.error(profileError);
+        await db.auth.signOut();
+        window.location.replace('index.html');
+        return;
+    }
+
     profile=profileData;
-    localStorage.setItem('ax_user',profile.username);
     await loadData();
 }
 
 async function loadData(){
-    const completedRaw=JSON.parse(localStorage.getItem('ax_completed_contracts')||'[]');
-    const abandonedRaw=JSON.parse(localStorage.getItem('ax_abandoned_contracts')||'[]');
-    const myCompleted=completedRaw.filter(c=>c.completedBy===user.id||c.completedUsername===profile.username||c.completedBy===profile.username);
-    const myAbandoned=abandonedRaw.filter(c=>c.hunter===user.id||c.hunterUsername===profile.username||c.hunter===profile.username);
-    const storageKey='hunter_data_'+user.id;
-    hunterData=JSON.parse(localStorage.getItem(storageKey)||'null');
-    if(!hunterData){
-        const hunterNumber='HX-'+Math.floor(100000+Math.random()*900000);
-        hunterData={name:prompt('First Name')||'Unknown',surname:prompt('Surname')||'Unknown',birth:prompt('Birth Date')||'Unknown',hunterName:prompt('Hunter Name')||profile.username,hunterNumber};
-        localStorage.setItem(storageKey,JSON.stringify(hunterData));
+    const {data:historyData,error:historyError}=await db
+        .from('contract_history')
+        .select('id,announcement_id,title,description,reward,image_url,status,reason,created_at')
+        .eq('hunter_id',user.id)
+        .order('created_at',{ascending:false});
+
+    if(historyError){
+        console.error('HISTORY ERROR:',historyError);
+        history=[];
+    }else{
+        history=historyData||[];
     }
+
     updateProfile();
-    renderStats(myCompleted,myAbandoned);
-    renderCompleted(myCompleted);
+    renderStats();
+    renderCompleted();
+    renderBadges();
     renderKills();
 }
 
-function updateProfile(){
-    document.querySelector('.info-content').innerHTML=`Name ${escapeHtml(hunterData.name)}<br>Surname ${escapeHtml(hunterData.surname)}<br>Birth date ${escapeHtml(hunterData.birth)}<br>Hunter name ${escapeHtml(hunterData.hunterName)}<br>Hunter number ${escapeHtml(hunterData.hunterNumber)}<br><button class="edit-btn" onclick="editProfile()">EDIT PROFILE</button>`;
+function displayValue(value){
+    return value===null||value===undefined||String(value).trim()===''?'Unknown':String(value);
 }
 
-function editProfile(){
-    hunterData.name=prompt('First Name',hunterData.name)||hunterData.name;
-    hunterData.surname=prompt('Surname',hunterData.surname)||hunterData.surname;
-    hunterData.birth=prompt('Birth Date',hunterData.birth)||hunterData.birth;
-    hunterData.hunterName=prompt('Hunter Name',hunterData.hunterName)||hunterData.hunterName;
-    localStorage.setItem('hunter_data_'+user.id,JSON.stringify(hunterData));
+function updateProfile(){
+    document.querySelector('.info-content').innerHTML=
+        `Name ${escapeHtml(displayValue(profile.first_name))}<br>`+
+        `Surname ${escapeHtml(displayValue(profile.surname))}<br>`+
+        `Birth date ${escapeHtml(displayValue(profile.birth_date))}<br>`+
+        `Hunter name ${escapeHtml(displayValue(profile.hunter_name))}<br>`+
+        `Hunter number ${escapeHtml(displayValue(profile.hunter_number))}<br>`+
+        `<button class="edit-btn" onclick="editProfile()">EDIT PROFILE</button>`;
+}
+
+async function editProfile(){
+    const firstName=prompt('First Name',displayValue(profile.first_name));
+    if(firstName===null)return;
+    const surname=prompt('Surname',displayValue(profile.surname));
+    if(surname===null)return;
+    const birthDate=prompt('Birth Date',displayValue(profile.birth_date));
+    if(birthDate===null)return;
+    const hunterName=prompt('Hunter Name',displayValue(profile.hunter_name));
+    if(hunterName===null)return;
+
+    const {error}=await db.rpc('update_hunter_profile',{
+        p_first_name:firstName,
+        p_surname:surname,
+        p_birth_date:birthDate,
+        p_hunter_name:hunterName,
+        p_hunter_number:profile.hunter_number
+    });
+
+    if(error){
+        console.error(error);
+        return alert('PROFILE UPDATE ERROR:\n\n'+error.message);
+    }
+
+    const {data:profileData,error:profileError}=await db
+        .from('Profiles')
+        .select('id,username,created_at,is_admin,first_name,surname,birth_date,hunter_name,hunter_number,kills')
+        .eq('id',user.id)
+        .single();
+
+    if(profileError||!profileData){
+        console.error(profileError);
+        return alert('PROFILE REFRESH ERROR.');
+    }
+
+    profile=profileData;
     updateProfile();
 }
 
-function renderStats(myCompleted,myAbandoned){
-    const xp=myCompleted.length*100;
+function renderStats(){
+    const completed=history.filter(item=>item.status==='completed').length;
+    const abandoned=history.filter(item=>item.status==='abandoned').length;
+    const xp=completed*100;
     const level=Math.floor(xp/500)+1;
     let rank='E';
-    if(myCompleted.length>=100)rank='SSS';else if(myCompleted.length>=75)rank='SS';else if(myCompleted.length>=50)rank='S';else if(myCompleted.length>=25)rank='A';else if(myCompleted.length>=10)rank='B';
-    const totalContracts=myCompleted.length+myAbandoned.length;
-    const successRate=totalContracts===0?100:Math.round((myCompleted.length/totalContracts)*100);
-    document.getElementById('hunter-stats-content').innerHTML=`<p>Rank : ${rank}</p><p>Level : ${level}</p><p>XP : ${xp}</p><p>Completed Contracts : ${myCompleted.length}</p><p>Abandoned Contracts : ${myAbandoned.length}</p><p>Success Rate : ${successRate}%</p>`;
+
+    if(completed>=100)rank='SSS';
+    else if(completed>=75)rank='SS';
+    else if(completed>=50)rank='S';
+    else if(completed>=25)rank='A';
+    else if(completed>=10)rank='B';
+
+    const total=completed+abandoned;
+    const successRate=total===0?100:Math.round((completed/total)*100);
+    const kills=Number(profile.kills)||0;
+
+    document.getElementById('hunter-stats-content').innerHTML=
+        `<p>Rank : ${rank}</p>`+
+        `<p>Level : ${level}</p>`+
+        `<p>XP : ${xp}</p>`+
+        `<p>Completed Contracts : ${completed}</p>`+
+        `<p>Abandoned Contracts : ${abandoned}</p>`+
+        `<p>Success Rate : ${successRate}%</p>`+
+        `<p>Kill Count : ${kills}</p>`;
+}
+
+function renderCompleted(){
+    const list=document.getElementById('completed-list');
+    list.innerHTML='';
+
+    const completed=history.filter(item=>item.status==='completed');
+    if(!completed.length){
+        list.innerHTML='<div class="completed-item">No completed contracts</div>';
+        return;
+    }
+
+    completed.forEach(contract=>{
+        const item=document.createElement('div');
+        item.className='completed-item';
+        item.textContent='✓ '+(contract.title||'Untitled contract');
+        list.appendChild(item);
+    });
+}
+
+function renderBadges(){
+    const box=document.getElementById('badges-content');
+    const completed=history.filter(item=>item.status==='completed').length;
+    const kills=Number(profile.kills)||0;
     const badges=[];
-    if(myCompleted.length>=1)badges.push('🎯 First Contract');
-    if(myCompleted.length>=10)badges.push('🏆 Veteran Hunter');
-    if(myCompleted.length>=25)badges.push('⚔ Elite Hunter');
-    if(myCompleted.length>=50)badges.push('👽 Alien Exterminator');
-    const kills=getKills();
+
+    if(completed>=1)badges.push('🎯 First Contract');
+    if(completed>=10)badges.push('🏆 Veteran Hunter');
+    if(completed>=25)badges.push('⚔ Elite Hunter');
+    if(completed>=50)badges.push('👽 Alien Exterminator');
     if(kills>=100)badges.push('💀 100 Kills Club');
     if(kills>=500)badges.push('☠ Reaper');
-    const badgeBox=document.createElement('div');badgeBox.className='hunter-stats';badgeBox.style.top='900px';badgeBox.innerHTML='<h2>BADGES</h2>'+(badges.length?badges.map(b=>`<p>${b}</p>`).join(''):'<p>No badges unlocked</p>');document.body.appendChild(badgeBox);
-}
 
-function renderCompleted(myCompleted){
-    const list=document.getElementById('completed-list');list.innerHTML='';
-    if(!myCompleted.length){list.innerHTML='<div class="completed-item">No completed contracts</div>';return}
-    myCompleted.forEach(contract=>{const item=document.createElement('div');item.className='completed-item';item.textContent='✓ '+(contract.title||'Untitled contract');list.appendChild(item)});
-}
-
-function getKills(){
-    const key='kills_'+user.id;let kills=localStorage.getItem(key);
-    if(kills===null)kills=Math.floor(Math.random()*1000)+100;else kills=parseInt(kills,10)||0;
-    localStorage.setItem(key,String(kills));return kills;
+    box.innerHTML=badges.length?badges.map(b=>`<p>${escapeHtml(b)}</p>`).join(''):'<p>No badges unlocked</p>';
 }
 
 function renderKills(){
-    const kills=getKills();const counter=document.getElementById('counter');counter.innerHTML='';
-    for(const digit of String(kills)){const img=document.createElement('img');img.src=digit+'.png';img.alt=digit;counter.appendChild(img)}
+    const kills=Math.max(0,Number(profile.kills)||0);
+    const counter=document.getElementById('counter');
+    counter.innerHTML='';
+
+    for(const digit of String(kills)){
+        const img=document.createElement('img');
+        img.src=digit+'.png';
+        img.alt=digit;
+        counter.appendChild(img);
+    }
 }
 
-function escapeHtml(value){const div=document.createElement('div');div.textContent=value??'';return div.innerHTML}
+function escapeHtml(value){
+    const div=document.createElement('div');
+    div.textContent=value??'';
+    return div.innerHTML;
+}
+
 start();
 </script>
 </body>
