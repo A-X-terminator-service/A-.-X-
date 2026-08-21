@@ -1,752 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Hunter Info</title>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-
-@font-face{
-    font-family:'Ax-Regular';
-    src:url('Ax-Regular.ttf.otf') format('opentype');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    background:black;
-    color:#ff0000;
-    font-family:'Ax-Regular',sans-serif;
-
-    width:100%;
-    min-height:1400px;
-    overflow-x:hidden;
-    overflow-y:auto;
-
-    position:relative;
-}
-
-.bg{
-    position:absolute;
-    top:6px;
-    right:0;
-    width:65%;
-    height:50%;
-    object-fit:cover;
-    z-index:0;
-}
-
-.photo{
-    position:absolute;
-    left:10px;
-    top:10px;
-    width:185px;
-    height:185px;
-    overflow:hidden;
-    z-index:5;
-}
-
-.photo img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
-
-.head{
-    position:absolute;
-    left:500px;
-    top:10px;
-    width:140px;
-    z-index:6;
-}
-
-.bodytxt{
-    position:absolute;
-    right:250px;
-    top:250px;
-    width:150px;
-    z-index:7;
-}
-
-.licenceText{
-    position:absolute;
-    left:600px;
-    top:310px;
-    font-size:35px;
-    color:black;
-    white-space:nowrap;
-    z-index:8;
-}
-
-.info{
-    position:absolute;
-    left:-4px;
-    top:200px;
-    width:540px;
-    z-index:4;
-}
-
-.info-content{
-    position:absolute;
-    top:10px;
-    left:20px;
-    font-size:28px;
-    line-height:1.5;
-    color:black;
-    z-index:20;
-}
-
-.completed-box{
-    position:absolute;
-    right:30px;
-    top:80px;
-
-    width:420px;
-    height:420px;
-
-    overflow-y:auto;
-
-    background:rgba(0,0,0,0.85);
-
-    border:2px solid #ff0000;
-
-    padding:20px;
-
-    z-index:30;
-}
-
-.completed-box{
-
-    position:absolute;
-
-    left:20px;
-
-    top:820px;
-
-    width:520px;
-
-    height:300px;
-
-    overflow-y:auto;
-
-    background:rgba(0,0,0,0.85);
-
-    border:2px solid #ff0000;
-
-    padding:20px;
-
-    z-index:30;
-}
-
-.completed-item{
-    color:white;
-    padding:8px 0;
-    border-bottom:1px solid #333;
-}
-
-.hunter-stats{
-    position:absolute;
-
-    right:30px;
-    top:540px;
-
-    width:420px;
-
-    background:rgba(0,0,0,0.85);
-
-    border:2px solid #ff0000;
-
-    padding:20px;
-
-    z-index:30;
-}
-
-.hunter-stats h2{
-    text-align:center;
-    margin-bottom:15px;
-}
-
-.hunter-stats p{
-    color:white;
-    margin-bottom:10px;
-}
-
-.blood{
-    position:absolute;
-    bottom:-80px;
-    left:0;
-    width:430px;
-    z-index:2;
-}
-
-.killtxt{
-    position:absolute;
-    left:15px;
-    bottom:1px;
-
-    font-size:65px;
-
-    color:white;
-
-    z-index:10;
-}
-
-.counter{
-    position:absolute;
-
-    left:340px;
-    bottom:-5px;
-
-    display:flex;
-
-    z-index:9;
-}
-
-.counter img{
-    height:135px;
-    margin-left:-10px;
-}
-
-.back-btn{
-    position:absolute;
-
-    top:20px;
-    right:800px;
-
-    background:#ff0000;
-    color:black;
-
-    border:none;
-
-    padding:10px 20px;
-
-    cursor:pointer;
-
-    font-family:'Ax-Regular';
-
-    z-index:50;
-}
-
-.edit-btn{
-    margin-top:15px;
-
-    background:#ff0000;
-    color:black;
-
-    border:none;
-
-    padding:10px 15px;
-
-    cursor:pointer;
-
-    font-family:'Ax-Regular';
-}
-
+@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;width:100%;min-height:1400px;overflow-x:hidden;overflow-y:auto;position:relative}
+.bg{position:absolute;top:6px;right:0;width:65%;height:50%;object-fit:cover;z-index:0}
+.photo{position:absolute;left:10px;top:10px;width:185px;height:185px;overflow:hidden;z-index:5}.photo img{width:100%;height:100%;object-fit:cover}
+.head{position:absolute;left:500px;top:10px;width:140px;z-index:6}.bodytxt{position:absolute;right:250px;top:250px;width:150px;z-index:7}
+.licenceText{position:absolute;left:600px;top:310px;font-size:35px;color:#000;white-space:nowrap;z-index:8}
+.info{position:absolute;left:-4px;top:200px;width:540px;z-index:4}.info-content{position:absolute;top:10px;left:20px;font-size:28px;line-height:1.5;color:#000;z-index:20}
+.completed-box{position:absolute;left:20px;top:820px;width:520px;height:300px;overflow-y:auto;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}
+.completed-item{color:#fff;padding:8px 0;border-bottom:1px solid #333}
+.hunter-stats{position:absolute;right:30px;top:540px;width:420px;background:rgba(0,0,0,.85);border:2px solid #ff0000;padding:20px;z-index:30}.hunter-stats h2{text-align:center;margin-bottom:15px}.hunter-stats p{color:#fff;margin-bottom:10px}
+.blood{position:absolute;bottom:-80px;left:0;width:430px;z-index:2}.killtxt{position:absolute;left:15px;bottom:1px;font-size:65px;color:#fff;z-index:10}.counter{position:absolute;left:340px;bottom:-5px;display:flex;z-index:9}.counter img{height:135px;margin-left:-10px}
+.back-btn{position:absolute;top:20px;right:800px;background:#ff0000;color:#000;border:none;padding:10px 20px;cursor:pointer;font-family:'Ax-Regular';z-index:50}.edit-btn{margin-top:15px;background:#ff0000;color:#000;border:none;padding:10px 15px;cursor:pointer;font-family:'Ax-Regular'}
 </style>
-
 </head>
-
 <body>
-
-<img
-    class="bg"
-    src="Alt7.png"
->
-
-<div class="photo">
-
-    <img src="pfp.jpg">
-
-</div>
-
-<img
-    class="head"
-    src="head.png"
->
-
-<img
-    class="bodytxt"
-    src="body.png"
->
-
-<div class="licenceText">
-
-    Alien X.terminator licence
-
-</div>
-
-<div class="info">
-
-    <img src="txtbox.png">
-
-    <div class="info-content">
-
-        Loading profile...
-
-    </div>
-
-</div>
-
-<div class="completed-box">
-
-    <h2>
-
-        COMPLETED CONTRACTS
-
-    </h2>
-
-    <div id="completed-list">
-
-    </div>
-
-</div>
-
-<div class="hunter-stats">
-
-    <h2>
-
-        HUNTER STATS
-
-    </h2>
-
-    <div id="hunter-stats-content">
-
-    </div>
-
-</div>
-
-<img
-    class="blood"
-    src="blood.png"
->
-
-<div class="killtxt">
-
-    Kill count :
-
-</div>
-
-<div
-    class="counter"
-    id="counter"
-></div>
-
-<button
-    class="back-btn"
-    onclick="window.location.href='Market.html'"
->
-    ← MARKET
-</button>
-
+<img class="bg" src="Alt7.png" alt="Background">
+<div class="photo"><img src="pfp.jpg" alt="Hunter photo"></div>
+<img class="head" src="Head.png" alt="Head">
+<img class="bodytxt" src="Body.png" alt="Body">
+<div class="licenceText">Alien X.terminator licence</div>
+<div class="info"><img src="txtbox.png" alt="Info box"><div class="info-content">Loading profile...</div></div>
+<div class="completed-box"><h2>COMPLETED CONTRACTS</h2><div id="completed-list"></div></div>
+<div class="hunter-stats"><h2>HUNTER STATS</h2><div id="hunter-stats-content"></div></div>
+<img class="blood" src="blood.png" alt="Blood">
+<div class="killtxt">Kill count :</div>
+<div class="counter" id="counter"></div>
+<button class="back-btn" onclick="window.location.replace('Market.html')">← MARKET</button>
 <script>
-    
-const currentUser =
-    localStorage.getItem(
-        'ax_user'
-    );
+const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
+const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let user=null,profile=null,hunterData=null;
 
-if(!currentUser){
-
-    window.location.href =
-        'index.html';
+async function start(){
+    const {data,error}=await db.auth.getSession();
+    if(error||!data.session){window.location.replace('index.html');return}
+    user=data.session.user;
+    const {data:profileData,error:profileError}=await db.from('Profiles').select('id,username,created_at,is_admin').eq('id',user.id).single();
+    if(profileError||!profileData){await db.auth.signOut();window.location.replace('index.html');return}
+    profile=profileData;
+    localStorage.setItem('ax_user',profile.username);
+    await loadData();
 }
 
-const completedContracts =
-    JSON.parse(
-        localStorage.getItem(
-            'ax_completed_contracts'
-        )
-    ) || [];
-
-const abandonedContracts =
-    JSON.parse(
-        localStorage.getItem(
-            'ax_abandoned_contracts'
-        )
-    ) || [];
-
-const myCompleted =
-    completedContracts.filter(
-        contract =>
-        contract.completedBy === currentUser
-    );
-
-const myAbandoned =
-    abandonedContracts.filter(
-        contract =>
-        contract.hunter === currentUser
-    );
-
-let hunterData =
-    JSON.parse(
-        localStorage.getItem(
-            'hunter_data'
-        )
-    );
-
-if(!hunterData){
-
-    const hunterNumber =
-        "HX-" +
-        Math.floor(
-            100000 +
-            Math.random() * 900000
-        );
-
-    hunterData = {
-
-        name:
-            prompt(
-                "First Name"
-            ) || "Unknown",
-
-        surname:
-            prompt(
-                "Surname"
-            ) || "Unknown",
-
-        birth:
-            prompt(
-                "Birth Date"
-            ) || "Unknown",
-
-        hunterName:
-            prompt(
-                "Hunter Name"
-            ) || "Unknown",
-
-        hunterNumber:
-            hunterNumber
-    };
-
-    localStorage.setItem(
-        'hunter_data',
-        JSON.stringify(
-            hunterData
-        )
-    );
+async function loadData(){
+    const completedRaw=JSON.parse(localStorage.getItem('ax_completed_contracts')||'[]');
+    const abandonedRaw=JSON.parse(localStorage.getItem('ax_abandoned_contracts')||'[]');
+    const myCompleted=completedRaw.filter(c=>c.completedBy===user.id||c.completedUsername===profile.username||c.completedBy===profile.username);
+    const myAbandoned=abandonedRaw.filter(c=>c.hunter===user.id||c.hunterUsername===profile.username||c.hunter===profile.username);
+    const storageKey='hunter_data_'+user.id;
+    hunterData=JSON.parse(localStorage.getItem(storageKey)||'null');
+    if(!hunterData){
+        const hunterNumber='HX-'+Math.floor(100000+Math.random()*900000);
+        hunterData={name:prompt('First Name')||'Unknown',surname:prompt('Surname')||'Unknown',birth:prompt('Birth Date')||'Unknown',hunterName:prompt('Hunter Name')||profile.username,hunterNumber};
+        localStorage.setItem(storageKey,JSON.stringify(hunterData));
+    }
+    updateProfile();
+    renderStats(myCompleted,myAbandoned);
+    renderCompleted(myCompleted);
+    renderKills();
 }
 
 function updateProfile(){
-
-    document.querySelector(
-        '.info-content'
-    ).innerHTML = `
-
-    Name ${hunterData.name}<br>
-
-    Surname ${hunterData.surname}<br>
-
-    Birth date ${hunterData.birth}<br>
-
-    Hunter name ${hunterData.hunterName}<br>
-
-    Hunter number ${hunterData.hunterNumber}<br>
-
-    <button
-        class="edit-btn"
-        onclick="editProfile()"
-    >
-        EDIT PROFILE
-    </button>
-
-    `;
+    document.querySelector('.info-content').innerHTML=`Name ${escapeHtml(hunterData.name)}<br>Surname ${escapeHtml(hunterData.surname)}<br>Birth date ${escapeHtml(hunterData.birth)}<br>Hunter name ${escapeHtml(hunterData.hunterName)}<br>Hunter number ${escapeHtml(hunterData.hunterNumber)}<br><button class="edit-btn" onclick="editProfile()">EDIT PROFILE</button>`;
 }
 
 function editProfile(){
-
-    hunterData.name =
-        prompt(
-            "First Name",
-            hunterData.name
-        ) || hunterData.name;
-
-    hunterData.surname =
-        prompt(
-            "Surname",
-            hunterData.surname
-        ) || hunterData.surname;
-
-    hunterData.birth =
-        prompt(
-            "Birth Date",
-            hunterData.birth
-        ) || hunterData.birth;
-
-    hunterData.hunterName =
-        prompt(
-            "Hunter Name",
-            hunterData.hunterName
-        ) || hunterData.hunterName;
-
-    localStorage.setItem(
-        'hunter_data',
-        JSON.stringify(
-            hunterData
-        )
-    );
-
+    hunterData.name=prompt('First Name',hunterData.name)||hunterData.name;
+    hunterData.surname=prompt('Surname',hunterData.surname)||hunterData.surname;
+    hunterData.birth=prompt('Birth Date',hunterData.birth)||hunterData.birth;
+    hunterData.hunterName=prompt('Hunter Name',hunterData.hunterName)||hunterData.hunterName;
+    localStorage.setItem('hunter_data_'+user.id,JSON.stringify(hunterData));
     updateProfile();
 }
 
-updateProfile();
-    
-const xp =
-    myCompleted.length * 100;
-
-const level =
-    Math.floor(
-        xp / 500
-    ) + 1;
-
-let rank = "E";
-
-if(myCompleted.length >= 100){
-
-    rank = "SSS";
-
-}else if(myCompleted.length >= 75){
-
-    rank = "SS";
-
-}else if(myCompleted.length >= 50){
-
-    rank = "S";
-
-}else if(myCompleted.length >= 25){
-
-    rank = "A";
-
-}else if(myCompleted.length >= 10){
-
-    rank = "B";
+function renderStats(myCompleted,myAbandoned){
+    const xp=myCompleted.length*100;
+    const level=Math.floor(xp/500)+1;
+    let rank='E';
+    if(myCompleted.length>=100)rank='SSS';else if(myCompleted.length>=75)rank='SS';else if(myCompleted.length>=50)rank='S';else if(myCompleted.length>=25)rank='A';else if(myCompleted.length>=10)rank='B';
+    const totalContracts=myCompleted.length+myAbandoned.length;
+    const successRate=totalContracts===0?100:Math.round((myCompleted.length/totalContracts)*100);
+    document.getElementById('hunter-stats-content').innerHTML=`<p>Rank : ${rank}</p><p>Level : ${level}</p><p>XP : ${xp}</p><p>Completed Contracts : ${myCompleted.length}</p><p>Abandoned Contracts : ${myAbandoned.length}</p><p>Success Rate : ${successRate}%</p>`;
+    const badges=[];
+    if(myCompleted.length>=1)badges.push('🎯 First Contract');
+    if(myCompleted.length>=10)badges.push('🏆 Veteran Hunter');
+    if(myCompleted.length>=25)badges.push('⚔ Elite Hunter');
+    if(myCompleted.length>=50)badges.push('👽 Alien Exterminator');
+    const kills=getKills();
+    if(kills>=100)badges.push('💀 100 Kills Club');
+    if(kills>=500)badges.push('☠ Reaper');
+    const badgeBox=document.createElement('div');badgeBox.className='hunter-stats';badgeBox.style.top='900px';badgeBox.innerHTML='<h2>BADGES</h2>'+(badges.length?badges.map(b=>`<p>${b}</p>`).join(''):'<p>No badges unlocked</p>');document.body.appendChild(badgeBox);
 }
 
-const totalContracts =
-    myCompleted.length +
-    myAbandoned.length;
-
-const successRate =
-    totalContracts === 0
-
-    ? 100
-
-    : Math.round(
-        (
-            myCompleted.length /
-            totalContracts
-        ) * 100
-    );
-
-document.getElementById(
-    'hunter-stats-content'
-).innerHTML = `
-
-<p>
-    Rank : ${rank}
-</p>
-
-<p>
-    Level : ${level}
-</p>
-
-<p>
-    XP : ${xp}
-</p>
-
-<p>
-    Completed Contracts :
-    ${myCompleted.length}
-</p>
-
-<p>
-    Abandoned Contracts :
-    ${myAbandoned.length}
-</p>
-
-<p>
-    Success Rate :
-    ${successRate}%
-</p>
-
-`;
-
-const completedList =
-    document.getElementById(
-        'completed-list'
-    );
-
-if(myCompleted.length === 0){
-
-    completedList.innerHTML = `
-
-        <div class="completed-item">
-
-            No completed contracts
-
-        </div>
-
-    `;
-
-}else{
-
-    myCompleted.forEach(contract => {
-
-        completedList.innerHTML += `
-
-            <div class="completed-item">
-
-                ✓ ${contract.title}
-
-            </div>
-
-        `;
-
-    });
-
-}
-    
-let kills =
-    localStorage.getItem(
-        "kills"
-    );
-
-if(kills === null){
-
-    kills =
-        Math.floor(
-            Math.random() * 1000
-        ) + 100;
-
-}else{
-
-    kills =
-        parseInt(kills);
+function renderCompleted(myCompleted){
+    const list=document.getElementById('completed-list');list.innerHTML='';
+    if(!myCompleted.length){list.innerHTML='<div class="completed-item">No completed contracts</div>';return}
+    myCompleted.forEach(contract=>{const item=document.createElement('div');item.className='completed-item';item.textContent='✓ '+(contract.title||'Untitled contract');list.appendChild(item)});
 }
 
-localStorage.setItem(
-    "kills",
-    kills
-);
-
-const counterZone =
-    document.getElementById(
-        "counter"
-    );
-
-counterZone.innerHTML = "";
-
-for(let digit of kills.toString()){
-
-    const img =
-        document.createElement(
-            "img"
-        );
-
-    img.src =
-        digit + ".png";
-
-    counterZone.appendChild(
-        img
-    );
+function getKills(){
+    const key='kills_'+user.id;let kills=localStorage.getItem(key);
+    if(kills===null)kills=Math.floor(Math.random()*1000)+100;else kills=parseInt(kills,10)||0;
+    localStorage.setItem(key,String(kills));return kills;
 }
 
-const badges = [];
-
-if(myCompleted.length >= 1){
-
-    badges.push(
-        "🎯 First Contract"
-    );
+function renderKills(){
+    const kills=getKills();const counter=document.getElementById('counter');counter.innerHTML='';
+    for(const digit of String(kills)){const img=document.createElement('img');img.src=digit+'.png';img.alt=digit;counter.appendChild(img)}
 }
 
-if(myCompleted.length >= 10){
-
-    badges.push(
-        "🏆 Veteran Hunter"
-    );
-}
-
-if(myCompleted.length >= 25){
-
-    badges.push(
-        "⚔ Elite Hunter"
-    );
-}
-
-if(myCompleted.length >= 50){
-
-    badges.push(
-        "👽 Alien Exterminator"
-    );
-}
-
-if(kills >= 100){
-
-    badges.push(
-        "💀 100 Kills Club"
-    );
-}
-
-if(kills >= 500){
-
-    badges.push(
-        "☠ Reaper"
-    );
-}
-    
-const badgeBox =
-    document.createElement(
-        "div"
-    );
-
-badgeBox.className =
-    "hunter-stats";
-
-badgeBox.style.top =
-    "900px";
-
-badgeBox.innerHTML = `
-
-<h2>
-
-    BADGES
-
-</h2>
-
-${
-    badges.length === 0
-
-    ?
-
-    `<p>
-        No badges unlocked
-    </p>`
-
-    :
-
-    badges.map(
-        badge =>
-        `<p>${badge}</p>`
-    ).join("")
-}
-
-`;
-
-document.body.appendChild(
-    badgeBox
-);
-
+function escapeHtml(value){const div=document.createElement('div');div.textContent=value??'';return div.innerHTML}
+start();
 </script>
-
 </body>
-
 </html>
