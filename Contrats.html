@@ -1,210 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Contracts</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>My Contracts</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;min-height:100vh}
-.top-bar{height:75px;background:#0a0a0a;border-bottom:3px solid #ff0000;display:flex;align-items:center;padding:0 20px;gap:20px}
-.left-icons{display:flex;gap:18px}.left-icons img{cursor:pointer;transition:.2s}.left-icons img:hover{transform:scale(1.15)}
-.header-title{flex:1;text-align:center;font-size:2rem;color:#ff0000}
-.market-grid{padding:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px;padding-bottom:100px}
-.market-card{background:#fff;color:#000;padding:20px;border:2px solid #ff0000}.card-img{width:100%;height:180px;object-fit:cover;margin-bottom:15px;background:#ddd}
-.reason-select{width:100%;margin-top:15px;padding:10px;background:#111;color:#ff0000;border:1px solid #ff0000;font-family:'Ax-Regular'}
-.abandon-btn,.complete-btn{width:100%;margin-top:15px;padding:10px;cursor:pointer;font-family:'Ax-Regular'}.abandon-btn{background:#ff0000;color:#000;border:none}.complete-btn{background:#000;color:#ff0000;border:2px solid #ff0000}
-.back-btn{position:fixed;bottom:20px;left:20px;background:#ff0000;color:#000;border:none;padding:12px 20px;font-family:'Ax-Regular';cursor:pointer;z-index:1000}.back-btn:hover{transform:scale(1.05)}
-.empty-text,.loading{width:100%;text-align:center;font-size:2rem;color:#ff0000;margin-top:50px}
-.error{width:100%;text-align:center;color:#ff0000;margin-top:50px;font-size:1.2rem}
-</style>
-</head>
-<body>
-<div class="top-bar">
-<div class="left-icons">
-<img src="file.png" width="40" height="35" onclick="window.location.replace('filepage.html')">
-<img src="Hunterid.png" width="45" height="35" onclick="window.location.replace('hunterinfo.html')">
-<img src="Iconecontrat.png" width="45" height="40" onclick="window.location.replace('Contrats.html')">
-</div>
-<div class="header-title">MY CONTRACTS</div>
-</div>
-<div id="contracts-container" class="market-grid"><div class="loading">LOADING...</div></div>
-<button class="back-btn" onclick="window.location.replace('Market.html')">← MARKET</button>
+@font-face{font-family:'Ax-Regular';src:url('Ax-Regular.ttf.otf') format('opentype')}*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;min-height:100vh}.top-bar{height:75px;background:#0a0a0a;border-bottom:3px solid #ff0000;display:flex;align-items:center;padding:0 20px;gap:20px}.left-icons{display:flex;gap:18px}.left-icons img{cursor:pointer;transition:.2s}.left-icons img:hover{transform:scale(1.15)}.header-title{flex:1;text-align:center;font-size:2rem}.market-grid{padding:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:25px;padding-bottom:100px}.market-card{background:#fff;color:#000;padding:20px;border:2px solid #ff0000}.card-img{width:100%;height:180px;object-fit:cover;margin-bottom:15px;background:#ddd}.conditions{margin:18px 0;padding:15px;background:#eee;border-left:4px solid #ff0000}.condition-row{display:flex;gap:10px;margin:9px 0;align-items:flex-start}.condition-row input{margin-top:4px}.reason-select,.proof-text{width:100%;margin-top:15px;padding:10px;background:#111;color:#ff0000;border:1px solid #ff0000;font-family:'Ax-Regular'}.proof-text{min-height:90px;resize:vertical}.proof-file{width:100%;margin-top:12px}.submit-btn,.abandon-btn{width:100%;margin-top:15px;padding:11px;cursor:pointer;font-family:'Ax-Regular'}.submit-btn{background:#ff0000;color:#000;border:none}.abandon-btn{background:#111;color:#ff0000;border:2px solid #ff0000}.pending{margin-top:15px;padding:12px;border:2px solid #ff0000;background:#111;color:#ff0000}.rejected{margin-top:15px;padding:12px;border:2px solid #ff0000;background:#220000;color:#fff}.back-btn{position:fixed;bottom:20px;left:20px;background:#ff0000;color:#000;border:none;padding:12px 20px;font-family:'Ax-Regular';cursor:pointer;z-index:1000}.empty-text,.loading,.error{width:100%;text-align:center;font-size:2rem;color:#ff0000;margin-top:50px}
+</style></head><body>
+<div class="top-bar"><div class="left-icons"><img src="file.png" width="40" height="35" onclick="window.location.replace('filepage.html')"><img src="Hunterid.png" width="45" height="35" onclick="window.location.replace('hunterinfo.html')"><img src="Iconecontrat.png" width="45" height="40" onclick="window.location.replace('Contrats.html')"></div><div class="header-title">MY CONTRACTS</div></div>
+<div id="contracts-container" class="market-grid"><div class="loading">LOADING...</div></div><button class="back-btn" onclick="window.location.replace('Market.html')">← MARKET</button>
 <script>
-const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
-const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let user=null;
-let profile=null;
-let contracts=[];
-let announcements=[];
-
-async function start(){
-    const {data,error}=await db.auth.getSession();
-    if(error||!data.session){window.location.replace('index.html');return}
-
-    user=data.session.user;
-
-    const {data:profileData,error:profileError}=await db
-        .from('Profiles')
-        .select('id,username,is_admin')
-        .eq('id',user.id)
-        .single();
-
-    if(profileError||!profileData){
-        await db.auth.signOut();
-        window.location.replace('index.html');
-        return;
-    }
-
-    profile=profileData;
-    await loadContracts();
-}
-
+const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let user=null,contracts=[];
+async function start(){const {data,error}=await db.auth.getSession();if(error||!data.session){window.location.replace('index.html');return}user=data.session.user;await loadContracts()}
 async function loadContracts(){
-    const {data:contractData,error:contractError}=await db
-        .from('contracts')
-        .select('id,announcement_id,hunter_id,created_at')
-        .eq('hunter_id',user.id)
-        .order('created_at',{ascending:false});
-
-    if(contractError){
-        console.error(contractError);
-        document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACTS</div>';
-        return;
-    }
-
-    contracts=contractData||[];
-    const ids=contracts.map(c=>c.announcement_id).filter(Boolean);
-
-    if(!ids.length){
-        announcements=[];
-        renderContracts();
-        return;
-    }
-
-    const {data:announcementData,error:announcementError}=await db
-        .from('announcements')
-        .select('*')
-        .in('id',ids);
-
-    if(announcementError){
-        console.error(announcementError);
-        document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACT DETAILS</div>';
-        return;
-    }
-
-    announcements=announcementData||[];
-    renderContracts();
+ const {data,error}=await db.from('contracts').select('id,announcement_id,hunter_id,status,submitted_at,proof_text,proof_data,verification_note,created_at,announcements(title,description,reward,image_url,conditions,required_kills)').eq('hunter_id',user.id).order('created_at',{ascending:false});
+ if(error){console.error(error);document.getElementById('contracts-container').innerHTML='<div class="error">ERROR LOADING CONTRACTS</div>';return}contracts=data||[];renderContracts()
 }
-
-function renderContracts(){
-    const container=document.getElementById('contracts-container');
-    container.innerHTML='';
-
-    if(!contracts.length){
-        container.innerHTML='<div class="empty-text">NO ACTIVE CONTRACTS</div>';
-        return;
-    }
-
-    contracts.forEach(contract=>{
-        const ann=announcements.find(a=>a.id===contract.announcement_id);
-        if(!ann)return;
-
-        const card=document.createElement('div');
-        card.className='market-card';
-
-        if(ann.image_url){
-            const img=document.createElement('img');
-            img.src=ann.image_url;
-            img.className='card-img';
-            img.alt=ann.title||'Contract';
-            card.appendChild(img);
-        }else{
-            const empty=document.createElement('div');
-            empty.className='card-img';
-            card.appendChild(empty);
-        }
-
-        const title=document.createElement('h2');
-        title.textContent=ann.title||'Untitled contract';
-        card.appendChild(title);
-
-        const desc=document.createElement('p');
-        desc.style.margin='15px 0';
-        desc.textContent=ann.description||'';
-        card.appendChild(desc);
-
-        const reward=document.createElement('p');
-        reward.textContent='Reward : '+(ann.reward||'Not specified');
-        card.appendChild(reward);
-
-        const select=document.createElement('select');
-        select.className='reason-select';
-        select.id='reason-'+contract.id;
-
-        ['Mission too difficult','Reward too low','Lack of time','Personal reasons','Selection mistake','Health issues','I accidentally fucked the alien'].forEach(reason=>{
-            const option=document.createElement('option');
-            option.textContent=reason;
-            option.value=reason;
-            select.appendChild(option);
-        });
-
-        card.appendChild(select);
-
-        const abandon=document.createElement('button');
-        abandon.className='abandon-btn';
-        abandon.textContent='ABANDON';
-        abandon.onclick=()=>abandonContract(contract.id);
-        card.appendChild(abandon);
-
-        const complete=document.createElement('button');
-        complete.className='complete-btn';
-        complete.textContent='CONTRACT COMPLETED';
-        complete.onclick=()=>completeContract(contract.id);
-        card.appendChild(complete);
-
-        container.appendChild(card);
-    });
+function renderContracts(){const c=document.getElementById('contracts-container');c.innerHTML='';if(!contracts.length){c.innerHTML='<div class="empty-text">NO ACTIVE CONTRACTS</div>';return}
+ contracts.forEach(contract=>{const a=contract.announcements||{};const card=document.createElement('div');card.className='market-card';
+  if(a.image_url){const img=document.createElement('img');img.src=a.image_url;img.className='card-img';img.alt=a.title||'Contract';card.appendChild(img)}else{const e=document.createElement('div');e.className='card-img';card.appendChild(e)}
+  const title=document.createElement('h2');title.textContent=a.title||'Untitled contract';card.appendChild(title);const desc=document.createElement('p');desc.style.margin='15px 0';desc.textContent=a.description||'';card.appendChild(desc);const reward=document.createElement('p');reward.textContent='Reward : '+(a.reward||'Not specified');card.appendChild(reward);
+  const kill=document.createElement('p');kill.style.marginTop='10px';kill.textContent='Kills awarded after approval : '+(Number(a.required_kills)||0);card.appendChild(kill);
+  const cond=document.createElement('div');cond.className='conditions';const h=document.createElement('h3');h.textContent='CONDITIONS TO VERIFY';cond.appendChild(h);const conditions=Array.isArray(a.conditions)?a.conditions:[];
+  if(!conditions.length){const p=document.createElement('p');p.textContent='No special conditions specified. Proof is still required.';cond.appendChild(p)}
+  if(contract.status==='active')conditions.forEach((condition,i)=>{const row=document.createElement('label');row.className='condition-row';const check=document.createElement('input');check.type='checkbox';check.dataset.condition='1';const text=document.createElement('span');text.textContent=condition;row.append(check,text);cond.appendChild(row)});
+  card.appendChild(cond);
+  if(contract.status==='pending_review'){
+   const p=document.createElement('div');p.className='pending';p.textContent='PENDING VERIFICATION — An admin must verify your conditions and proof.';card.appendChild(p);
+   if(contract.proof_text){const t=document.createElement('p');t.style.marginTop='12px';t.textContent='Submitted note : '+contract.proof_text;card.appendChild(t)}
+  }else{
+   if(contract.verification_note){const r=document.createElement('div');r.className='rejected';r.textContent='ADMIN FEEDBACK : '+contract.verification_note;card.appendChild(r)}
+   const proof=document.createElement('textarea');proof.className='proof-text';proof.id='proof-'+contract.id;proof.placeholder='Explain how you completed the conditions. This will be checked by an admin.';card.appendChild(proof);
+   const file=document.createElement('input');file.type='file';file.accept='image/*';file.className='proof-file';file.id='proof-file-'+contract.id;card.appendChild(file);
+   const submit=document.createElement('button');submit.className='submit-btn';submit.textContent='SUBMIT FOR VERIFICATION';submit.onclick=()=>submitForReview(contract.id);card.appendChild(submit);
+   const select=document.createElement('select');select.className='reason-select';select.id='reason-'+contract.id;['Mission too difficult','Reward too low','Lack of time','Personal reasons','Selection mistake','Health issues'].forEach(reason=>{const o=document.createElement('option');o.value=reason;o.textContent=reason;select.appendChild(o)});card.appendChild(select);
+   const abandon=document.createElement('button');abandon.className='abandon-btn';abandon.textContent='ABANDON';abandon.onclick=()=>abandonContract(contract.id);card.appendChild(abandon)
+  }
+  c.appendChild(card)
+ })
 }
-
-async function abandonContract(contractId){
-    const reason=document.getElementById('reason-'+contractId)?.value||'Not specified';
-    if(!confirm('Abandon this contract?\n\nReason: '+reason))return;
-
-    const {error}=await db.rpc('abandon_contract',{
-        p_contract_id:contractId,
-        p_reason:reason
-    });
-
-    if(error){
-        console.error(error);
-        alert('ABANDON ERROR:\n\n'+error.message);
-        return;
-    }
-
-    await loadContracts();
+async function submitForReview(id){
+ const contract=contracts.find(x=>x.id===id);if(!contract)return;const checks=[...document.querySelectorAll('#contracts-container input[type=checkbox][data-condition="1"]')];
+ const card=[...document.querySelectorAll('.market-card')].find(el=>el.querySelector('#proof-'+id));
+ const checked=card?[...card.querySelectorAll('input[type=checkbox][data-condition="1"]')]:[];
+ if(checked.some(x=>!x.checked))return alert('You must confirm every condition before submitting.');
+ const text=document.getElementById('proof-'+id)?.value.trim()||'';const file=document.getElementById('proof-file-'+id)?.files[0];if(!text&&!file)return alert('Proof is required.');if(file&&file.size>2000000)return alert('Proof image must be smaller than 2 MB.');
+ let data=null;if(file){data=await fileToDataURL(file)}
+ if(!confirm('Submit this contract for admin verification?'))return;
+ const {error}=await db.rpc('submit_contract_for_review',{p_contract_id:id,p_proof_text:text||null,p_proof_data:data});if(error){console.error(error);return alert('SUBMISSION ERROR:\n\n'+error.message)}await loadContracts();alert('SUBMITTED FOR VERIFICATION.');
 }
-
-async function completeContract(contractId){
-    if(!confirm('Mark this contract as completed?'))return;
-
-    const {error}=await db.rpc('complete_contract',{
-        p_contract_id:contractId
-    });
-
-    if(error){
-        console.error(error);
-        alert('COMPLETE ERROR:\n\n'+error.message);
-        return;
-    }
-
-    await loadContracts();
-}
-
+function fileToDataURL(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(file)})}
+async function abandonContract(id){const reason=document.getElementById('reason-'+id)?.value||'Not specified';if(!confirm('Abandon this contract?\n\nReason: '+reason))return;const {error}=await db.rpc('abandon_contract',{p_contract_id:id,p_reason:reason});if(error){console.error(error);return alert('ABANDON ERROR:\n\n'+error.message)}await loadContracts()}
 start();
-</script>
-</body>
-</html>
+</script></body></html>
