@@ -25,14 +25,106 @@ body{background:#000;color:#ff0000;font-family:'Ax-Regular',sans-serif;height:10
 </div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL="https://xsdppckxzzxwnridrjzp.supabase.co";
-const SUPABASE_KEY="sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH";
+const SUPABASE_URL='https://xsdppckxzzxwnridrjzp.supabase.co';
+const SUPABASE_KEY='sb_publishable_-Cycmotnb9YMM5iIM57QJw_6a6h7TQH';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-function goToAuth(){document.getElementById('landing').style.display='none';document.getElementById('auth-page').style.display='flex'}
-function switchTab(tab){document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',i===tab));document.getElementById('login-form').style.display=tab===0?'block':'none';document.getElementById('signup-form').style.display=tab===1?'block':'none'}
-async function signup(){const username=document.getElementById('signup-username').value.trim(),email=document.getElementById('signup-email').value.trim(),password=document.getElementById('signup-password').value,confirmPassword=document.getElementById('signup-confirm').value;if(!username||!email||!password||!confirmPassword)return alert('Please fill in every field.');if(username.length<3)return alert('Username must contain at least 3 characters.');if(password.length<6)return alert('Password must contain at least 6 characters.');if(password!==confirmPassword)return alert('Passwords do not match.');const {error}=await db.auth.signUp({email,password,options:{data:{username},emailRedirectTo:window.location.origin+window.location.pathname}});if(error){console.error(error);return alert(error.message)}alert('Account created successfully!\n\nCheck your email and confirm your account before logging in.');switchTab(0);document.getElementById('login-email').value=email}
-async function login(){const email=document.getElementById('login-email').value.trim(),password=document.getElementById('login-password').value;if(!email||!password)return alert('Enter your email and password.');const {data,error}=await db.auth.signInWithPassword({email,password});if(error){console.error(error);return alert(error.message)}if(!data.user?.email_confirmed_at){await db.auth.signOut();return alert('Please confirm your email before logging in.')}const {data:profile,error:profileError}=await db.from('Profiles').select('id,username').eq('id',data.user.id).single();if(profileError||!profile){console.error(profileError);await db.auth.signOut();return alert('Your account profile could not be found.')}localStorage.setItem('ax_user',profile.username);window.location.replace('Market.html')}
-async function checkSession(){const {data,error}=await db.auth.getSession();if(error){console.error(error);return}if(data.session){const {data:profile}=await db.from('Profiles').select('username').eq('id',data.session.user.id).single();if(profile?.username)localStorage.setItem('ax_user',profile.username);window.location.replace('Market.html')}}
+
+function goToAuth(){
+    document.getElementById('landing').style.display='none';
+    document.getElementById('auth-page').style.display='flex';
+}
+
+function switchTab(tab){
+    document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',i===tab));
+    document.getElementById('login-form').style.display=tab===0?'block':'none';
+    document.getElementById('signup-form').style.display=tab===1?'block':'none';
+}
+
+async function signup(){
+    const username=document.getElementById('signup-username').value.trim();
+    const email=document.getElementById('signup-email').value.trim();
+    const password=document.getElementById('signup-password').value;
+    const confirmPassword=document.getElementById('signup-confirm').value;
+
+    if(!username||!email||!password||!confirmPassword)return alert('Please fill in every field.');
+    if(username.length<3)return alert('Username must contain at least 3 characters.');
+    if(password.length<6)return alert('Password must contain at least 6 characters.');
+    if(password!==confirmPassword)return alert('Passwords do not match.');
+
+    const {error}=await db.auth.signUp({
+        email,
+        password,
+        options:{
+            data:{username},
+            emailRedirectTo:window.location.origin+window.location.pathname
+        }
+    });
+
+    if(error){
+        console.error(error);
+        return alert(error.message);
+    }
+
+    alert('Account created successfully!\n\nCheck your email and confirm your account before logging in.');
+    switchTab(0);
+    document.getElementById('login-email').value=email;
+}
+
+async function login(){
+    const email=document.getElementById('login-email').value.trim();
+    const password=document.getElementById('login-password').value;
+
+    if(!email||!password)return alert('Enter your email and password.');
+
+    const {data,error}=await db.auth.signInWithPassword({email,password});
+    if(error){
+        console.error(error);
+        return alert(error.message);
+    }
+
+    if(!data.user?.email_confirmed_at){
+        await db.auth.signOut();
+        return alert('Please confirm your email before logging in.');
+    }
+
+    const {data:profile,error:profileError}=await db
+        .from('Profiles')
+        .select('id,username,is_admin')
+        .eq('id',data.user.id)
+        .single();
+
+    if(profileError||!profile){
+        console.error(profileError);
+        await db.auth.signOut();
+        return alert('Your account profile could not be found.');
+    }
+
+    window.location.replace('Market.html');
+}
+
+async function checkSession(){
+    const {data,error}=await db.auth.getSession();
+    if(error){
+        console.error(error);
+        return;
+    }
+
+    if(!data.session)return;
+
+    const {data:profile,error:profileError}=await db
+        .from('Profiles')
+        .select('id')
+        .eq('id',data.session.user.id)
+        .single();
+
+    if(profileError||!profile){
+        await db.auth.signOut();
+        return;
+    }
+
+    window.location.replace('Market.html');
+}
+
 checkSession();
 </script>
 </body>
